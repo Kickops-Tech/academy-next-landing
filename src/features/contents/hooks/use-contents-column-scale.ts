@@ -15,7 +15,9 @@ export function useContentsColumnScale(
   containerRef: RefObject<HTMLElement | null>,
   variant: ContentsLayoutVariant,
 ) {
-  const [scale, setScale] = useState(() => CONTENTS_COLUMNS_SCALE[variant]);
+  const [scale, setScale] = useState<number>(
+    () => CONTENTS_COLUMNS_SCALE[variant],
+  );
 
   useLayoutEffect(() => {
     const node = containerRef.current;

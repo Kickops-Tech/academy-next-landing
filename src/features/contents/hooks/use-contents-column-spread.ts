@@ -14,7 +14,7 @@ export function useContentsColumnSpread(
   containerRef: RefObject<HTMLElement | null>,
   variant: ContentsLayoutVariant,
 ) {
-  const [spread, setSpread] = useState(
+  const [spread, setSpread] = useState<number>(
     () => CONTENTS_COLUMNS_SPREAD_DEFAULT[variant],
   );
 

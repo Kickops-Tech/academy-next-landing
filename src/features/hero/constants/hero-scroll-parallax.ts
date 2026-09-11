@@ -24,3 +24,13 @@ export const HERO_SCROLL_TITLE_FADE_AMOUNT = 1;
 /** Supporting copy / CTA fade fastest. */
 export const HERO_SCROLL_COPY_FADE_EXPONENT = 1.65;
 export const HERO_SCROLL_COPY_FADE_AMOUNT = 1;
+
+/** CSS custom properties written on the hero `<section>`. */
+export const HERO_SCROLL_CSS = {
+  bustY: "--hero-bust-y",
+  bustOpacity: "--hero-bust-opacity",
+  titleY: "--hero-title-y",
+  titleOpacity: "--hero-title-opacity",
+  copyY: "--hero-copy-y",
+  copyOpacity: "--hero-copy-opacity",
+} as const;

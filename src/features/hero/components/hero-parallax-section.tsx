@@ -5,6 +5,7 @@ import { Button } from "@shadcn/ui/button";
 import { HeroArtificialText } from "@features/hero/components/hero-artificial-text";
 import { HeroBaffleText } from "@features/hero/components/hero-baffle-text";
 import { HeroBust } from "@features/hero/components/hero-bust";
+import { HERO_SCROLL_CSS } from "@features/hero/constants/hero-scroll-parallax";
 import { useHeroScrollParallax } from "@features/hero/hooks/use-hero-scroll-parallax";
 import { useRef, type CSSProperties } from "react";
 
@@ -26,24 +27,34 @@ const HERO_TITLE_INTROSPECCAO_SIZE =
 const HERO_TITLE_IA_SIZE =
   "text-[clamp(2.5rem,0.35rem+11.2vw,5.5rem)] md:text-[6.75rem] lg:text-[7.25rem] xl:text-[7.75rem] 2xl:text-[8.75rem]";
 
-function parallaxStyle(layer: {
-  translateY: number;
-  opacity: number;
-}): CSSProperties {
+function layerStyle(yVar: string, opacityVar: string): CSSProperties {
   return {
-    transform: `translate3d(0, ${layer.translateY}px, 0)`,
-    opacity: layer.opacity,
-    willChange: "transform, opacity",
+    transform: `translate3d(0, var(${yVar}, 0px), 0)`,
+    opacity: `var(${opacityVar}, 1)`,
   };
 }
+
+const BUST_LAYER_STYLE = layerStyle(
+  HERO_SCROLL_CSS.bustY,
+  HERO_SCROLL_CSS.bustOpacity,
+);
+const TITLE_LAYER_STYLE = layerStyle(
+  HERO_SCROLL_CSS.titleY,
+  HERO_SCROLL_CSS.titleOpacity,
+);
+const COPY_LAYER_STYLE = layerStyle(
+  HERO_SCROLL_CSS.copyY,
+  HERO_SCROLL_CSS.copyOpacity,
+);
 
 /**
  * Hero section with scroll parallax: bust moves up faster and fades slower;
  * titles and copy fade out sooner with lighter vertical travel.
+ * Parallax is driven by CSS vars on the section (no React re-renders on scroll).
  */
 export function HeroParallaxSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const { bust, title, copy } = useHeroScrollParallax(sectionRef);
+  useHeroScrollParallax(sectionRef);
 
   return (
     <section
@@ -66,7 +77,7 @@ export function HeroParallaxSection() {
       >
         <div
           className="flex h-full w-full items-center justify-center"
-          style={parallaxStyle(bust)}
+          style={BUST_LAYER_STYLE}
         >
           <HeroBust
             className={cn(
@@ -110,7 +121,7 @@ export function HeroParallaxSection() {
             "flex w-full max-w-full flex-col items-center overflow-visible",
             "leading-none tracking-tight",
           )}
-          style={parallaxStyle(title)}
+          style={TITLE_LAYER_STYLE}
         >
           <HeroBaffleText
             text={"Introspecção"}
@@ -146,7 +157,7 @@ export function HeroParallaxSection() {
           </span>
         </h1>
 
-        <div style={parallaxStyle(copy)}>
+        <div style={COPY_LAYER_STYLE}>
           <p
             className={cn(
               "mt-5 max-w-[20.5625rem] text-sm leading-[1.4] text-white md:mt-6 md:max-w-[40rem] md:text-base",
