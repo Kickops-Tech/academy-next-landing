@@ -14,10 +14,12 @@ export function TargetMain() {
     <section
       ref={sectionRef}
       aria-label="Pra quem"
+      data-globe-section="target"
       style={SECTION_HEADING_SECTION_STYLE}
       className={cn(
         "flex w-full min-h-svh flex-col justify-center",
-        "bg-kickops-yellow text-kickops-gray",
+        // Fill comes from WireframeGlobeBand (watermark sits above fill).
+        "text-kickops-gray",
       )}
     >
       <TargetAudienceSection />

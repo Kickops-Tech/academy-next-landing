@@ -1,4 +1,5 @@
 import { SiteFooter } from "@core/components/site-footer";
+import { WireframeGlobeBand } from "@core/components/wireframe-globe-band";
 import { ContentsMain } from "@features/contents/components/contents-main";
 import { FormatsMain } from "@features/formats/components/formats-main";
 import { HeroMain } from "@features/hero/components/hero-main";
@@ -16,23 +17,27 @@ export default function HomePage() {
   return (
     <>
       <HeroMain />
-      <TargetMain />
-      <ContentsMain />
-      {/*
-        Formats + People share one gray band. Desktop brain lives in People
-        (Figma stage, bleeds up into Formats) with scroll parallax — not sticky.
-        overflow-clip: tall art must not extend document scroll past the footer.
-        data-brain-hover-root: hover pixelate trail when glitch is on.
-      */}
-      <div
-        data-brain-hover-root=""
-        className="relative flex min-h-[100svh] flex-col overflow-clip bg-kickops-gray"
-      >
-        <FormatsMain />
-        <div className="relative z-[1] flex min-h-0 flex-1 flex-col">
-          <PeopleMain />
+      <WireframeGlobeBand>
+        <TargetMain />
+        <ContentsMain />
+        {/*
+          Formats + People share one gray band. Desktop brain lives in People
+          (Figma stage, bleeds up into Formats) with scroll parallax — not sticky.
+          overflow-clip: tall art must not extend document scroll past the footer.
+          data-brain-hover-root: hover pixelate trail when glitch is on.
+          Fill comes from WireframeGlobeBand (watermark sits above fill).
+        */}
+        <div
+          data-brain-hover-root=""
+          data-globe-section="formats"
+          className="relative flex min-h-[100svh] flex-col overflow-clip"
+        >
+          <FormatsMain />
+          <div className="relative z-[1] flex min-h-0 flex-1 flex-col">
+            <PeopleMain />
+          </div>
         </div>
-      </div>
+      </WireframeGlobeBand>
       <SiteFooter />
     </>
   );

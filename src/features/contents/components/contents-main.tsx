@@ -16,9 +16,11 @@ export function ContentsMain() {
     <section
       ref={sectionRef}
       aria-label="Vamos abordar"
+      data-globe-section="contents"
       style={SECTION_HEADING_SECTION_STYLE}
       className={cn(
-        "w-full bg-white text-kickops-gray",
+        "w-full text-kickops-gray",
+        // Fill comes from WireframeGlobeBand (watermark sits above fill).
         // Desktop stage fills the viewport; flow layout below xl must not leave a white void.
         "xl:min-h-svh",
       )}

@@ -7,6 +7,12 @@ function toPercent(value: number, total: number) {
   return `${(value / total) * 100}%`;
 }
 
+/**
+ * Full-bleed readability scrim: bottom of the People fold up to just
+ * under “MENTES PENSANTES” (heading sits ~4.45cqh; display ~13cqw tall).
+ */
+const PEOPLE_DESKTOP_SCRIM_TOP = 250;
+
 export function PeopleSection() {
   return (
     <div className="relative flex min-h-0 w-full flex-1 flex-col overflow-visible">
@@ -19,11 +25,10 @@ export function PeopleSection() {
           <AcademyBrain variant="desktop" />
 
           <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 z-[15] bg-gradient-to-b from-transparent to-kickops-gray"
+            aria-hidden={true}
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[15] bg-linear-to-t from-black/90 via-black/55 to-transparent"
             style={{
-              top: toPercent(359, PEOPLE_DESKTOP_FRAME.height),
-              height: toPercent(540, PEOPLE_DESKTOP_FRAME.height),
+              top: toPercent(PEOPLE_DESKTOP_SCRIM_TOP, PEOPLE_DESKTOP_FRAME.height),
             }}
           />
 
@@ -49,6 +54,10 @@ export function PeopleSection() {
       <div className="@container relative flex min-h-[min(100%,20rem)] w-full flex-1 flex-col overflow-visible px-6 pb-16 xl:hidden md:px-12">
         <AcademyBrain variant="mobile" layout="flow" />
         <PeopleHeading variant="mobile" />
+        <div
+          aria-hidden={true}
+          className="pointer-events-none absolute inset-x-0 bottom-0 top-[7.5rem] z-[15] bg-linear-to-t from-black/90 via-black/55 to-transparent"
+        />
         <div className="relative z-20 w-full pointer-events-auto">
           <PeopleCarousel layout="mobile" />
         </div>
