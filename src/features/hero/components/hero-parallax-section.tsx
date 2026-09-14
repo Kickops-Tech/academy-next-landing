@@ -18,14 +18,14 @@ const HERO_DESCRIPTION =
 const HERO_CTA_LABEL = "Quero saber mais";
 
 /**
- * Fluid mobile sizes (clamp + vw), then stepped rem from md up.
- * Keeps “INTELIGÊNCIA” / “ARTIFICIAL” inside the padded stage on narrow phones.
+ * Fluid mobile → stepped desktop → plateau at 3xl (1920px).
+ * Atmosphere stays full-bleed; type/bust stop growing past ~2K.
  */
 const HERO_TITLE_INTROSPECCAO_SIZE =
-  "text-[clamp(1.75rem,0.55rem+6.8vw,3rem)] md:text-[4.5rem] lg:text-[5.25rem] xl:text-[6rem] 2xl:text-[6.75rem]";
+  "text-[clamp(2.75rem,1.25rem+8vw,4rem)] md:text-[4.5rem] lg:text-[5.25rem] xl:text-[6rem] 2xl:text-[6.75rem] 3xl:text-[7.5rem]";
 
 const HERO_TITLE_IA_SIZE =
-  "text-[clamp(2.5rem,0.35rem+11.2vw,5.5rem)] md:text-[6.75rem] lg:text-[7.25rem] xl:text-[7.75rem] 2xl:text-[8.75rem]";
+  "text-[clamp(5rem,2rem+14vw,7rem)] md:text-[6.75rem] lg:text-[7.25rem] xl:text-[7.75rem] 2xl:text-[8.75rem] 3xl:text-[10rem]";
 
 function layerStyle(yVar: string, opacityVar: string): CSSProperties {
   return {
@@ -61,9 +61,9 @@ export function HeroParallaxSection() {
       ref={sectionRef}
       aria-label={"Hero"}
       className={cn(
-        "relative w-full min-h-svh overflow-hidden",
+        "relative w-full min-h-fold overflow-hidden",
         // Narrow viewports: lock to one screen so overlay padding can’t grow the fold.
-        "h-svh md:h-auto",
+        "h-fold md:h-auto",
         "flex flex-col items-center justify-end",
         "bg-kickops-gray text-white",
         "bg-radial from-kickops-lightgray to-kickops-gray",
@@ -76,19 +76,24 @@ export function HeroParallaxSection() {
         )}
       >
         <div
-          className="flex h-full w-full items-center justify-center"
+          className={cn(
+            "flex h-full w-full justify-center",
+            // Mobile: sit the bust on the title stack (less empty crown).
+            "items-end pb-[22%] md:items-center md:pb-0",
+          )}
           style={BUST_LAYER_STYLE}
         >
           <HeroBust
             className={cn(
               "select-none",
               /*
-                Height-driven on all breakpoints so aspect ratio resolves.
-                Avoid width: % inside a shrink-wrapped flex item — on mobile
-                that circular % can collapse the bust box to 0×0 (no WebGL).
+                Height-driven so aspect ratio resolves. Caps climb through 2xl/3xl
+                then plateau — no pure-vw growth on 4K ultrawides.
               */
-              "h-[min(68svh,26rem)] w-auto max-w-none",
-              "md:h-[min(110svh,64.375rem)]",
+              "h-[min(86svh,42rem)] w-auto max-w-[min(100vw,28rem)]",
+              "md:h-[min(110svh,64.375rem)] md:max-w-none",
+              "2xl:h-[min(108svh,72rem)]",
+              "3xl:h-[min(105svh,80rem)]",
             )}
           />
         </div>
@@ -110,10 +115,13 @@ export function HeroParallaxSection() {
       <div
         data-hero-overlay=""
         className={cn(
-          "relative z-20 flex w-full max-w-[94.5rem] flex-col items-center text-center",
-          // Mobile: light top pad — justify-end parks the CTA; huge pt was clipping the title.
-          "px-4 pb-8 pt-4",
+          "relative z-20 flex w-full flex-col items-center text-center",
+          // Figma 1512 → soft grow to 1920 (3xl), then plateau for 4K.
+          "max-w-[94.5rem] 3xl:max-w-[120rem]",
+          // Mobile: light top pad — justify-end parks the CTA; keep titles readable.
+          "px-3 pb-8 pt-4",
           "md:px-8 md:pb-20 md:pt-[min(40svh,20rem)]",
+          "3xl:pb-24 3xl:pt-[min(36svh,22rem)]",
         )}
       >
         <h1
@@ -160,7 +168,9 @@ export function HeroParallaxSection() {
         <div style={COPY_LAYER_STYLE}>
           <p
             className={cn(
-              "mt-5 max-w-[20.5625rem] text-sm leading-[1.4] text-white md:mt-6 md:max-w-[40rem] md:text-base",
+              "mt-5 max-w-[20.5625rem] text-sm leading-[1.4] text-white",
+              "md:mt-6 md:max-w-[40rem] md:text-base",
+              "3xl:mt-8 3xl:max-w-[48rem] 3xl:text-lg",
             )}
           >
             {HERO_DESCRIPTION}
@@ -168,9 +178,9 @@ export function HeroParallaxSection() {
 
           <Button
             className={cn(
-              "mt-6 h-auto rounded-none border-0 md:mt-8",
-              "bg-kickops-yellow px-10 py-6",
-              "text-base font-bold text-kickops-gray md:text-lg",
+              "mt-6 h-auto rounded-none border-0 md:mt-8 3xl:mt-10",
+              "bg-kickops-yellow px-10 py-6 3xl:px-12 3xl:py-7",
+              "text-base font-bold text-kickops-gray md:text-lg 3xl:text-xl",
               "hover:bg-kickops-yellow/90",
             )}
           >

@@ -17,9 +17,11 @@ export function FormatsCta({
     <Link
       href="#"
       className={cn(
-        "inline-flex items-center justify-center border border-white/25 bg-kickops-gray px-10 py-6",
+        "inline-flex items-center justify-center border border-white/25 bg-kickops-gray",
         "font-bold text-center whitespace-nowrap transition-colors hover:border-white/40",
-        size === "desktop" ? "text-[18px]" : "text-[16px]",
+        size === "desktop"
+          ? "px-[2.65cqw] py-[1.59cqw] text-[1.19cqw]"
+          : "px-10 py-6 text-[16px]",
         className,
       )}
       style={style}

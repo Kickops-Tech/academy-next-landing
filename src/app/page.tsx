@@ -30,10 +30,10 @@ export default function HomePage() {
         <div
           data-brain-hover-root=""
           data-globe-section="formats"
-          className="relative flex min-h-[100svh] flex-col overflow-clip"
+          className="relative flex flex-col overflow-clip"
         >
           <FormatsMain />
-          <div className="relative z-[1] flex min-h-0 flex-1 flex-col">
+          <div className="relative z-[1] flex flex-col">
             <PeopleMain />
           </div>
         </div>

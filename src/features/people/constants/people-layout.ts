@@ -14,5 +14,18 @@ export type PeopleLayoutVariant = "desktop" | "mobile";
 
 export const PEOPLE_CAROUSEL_MS = 360;
 
-/** Horizontal travel for enter/exit swipe (direction-aware). */
-export const PEOPLE_CAROUSEL_SWIPE_X = "42%";
+/**
+ * Strip travel as a fraction of track width — short of a full card so the
+ * neighbor peeks/bleeds outside the stage early (continuity), without needing
+ * to drag past the whole card.
+ */
+export const PEOPLE_CAROUSEL_TRAVEL_FRACTION = 0.48;
+
+/**
+ * Extra space between current and neighbor on the strip (fraction of track).
+ * Keeps cards from reading as glued during drag.
+ */
+export const PEOPLE_CAROUSEL_STRIP_GAP_FRACTION = 0.14;
+
+/** Commit when drag reaches this fraction of track width. */
+export const PEOPLE_CAROUSEL_DRAG_COMMIT_FRACTION = 0.16;

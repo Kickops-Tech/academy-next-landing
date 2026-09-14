@@ -28,12 +28,12 @@ export const SECTION_HEADING_ENTER_VIEWPORT_START = 0.52;
 export const SECTION_HEADING_ENTER_VIEWPORT_END = 0.12;
 
 /**
- * Viewport: fade-out pelo topo — o título fica abaixo do topo da seção,
- * então o fade só começa depois que o bloco já saiu bastante da tela
- * (parallax de scroll continua independente).
+ * Exit keyed on the heading box (not the section top):
+ * start when this fraction of the title has left the viewport (0.5 = half out),
+ * end when this much of the title height is above the top edge.
  */
-export const SECTION_HEADING_EXIT_VIEWPORT_START = -0.35;
-export const SECTION_HEADING_EXIT_VIEWPORT_END = -0.95;
+export const SECTION_HEADING_EXIT_OUT_FRACTION_START = 0.5;
+export const SECTION_HEADING_EXIT_OUT_FRACTION_END = 1.2;
 
 /** CSS custom properties written on the section element. */
 export const SECTION_HEADING_CSS = {

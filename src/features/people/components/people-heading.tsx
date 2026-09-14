@@ -5,17 +5,18 @@ import {
   SECTION_HEADING_LEAD_STYLE,
   SECTION_HEADING_TRAIL_STYLE,
 } from "@core/utils/section-heading-parallax-style";
+import { PEOPLE_HEADING } from "@features/people/constants/people-content";
 import type { PeopleLayoutVariant } from "@features/people/constants/people-layout";
 import { cn } from "@shadcn/lib/utils";
 
 const HEADING_FONT = {
   desktop: {
-    mentes: "text-[6.61cqw]",
-    pensantes: "text-[13.23cqw]",
+    lead: "text-[6.61cqw]",
+    display: "text-[13.23cqw]",
   },
   mobile: {
-    mentes: SECTION_DISPLAY_HEADING_MOBILE.lead,
-    pensantes: SECTION_DISPLAY_HEADING_MOBILE.display,
+    lead: SECTION_DISPLAY_HEADING_MOBILE.lead,
+    display: SECTION_DISPLAY_HEADING_MOBILE.display,
   },
 } as const;
 
@@ -32,23 +33,23 @@ export function PeopleHeading({ variant }: PeopleHeadingProps) {
         <span
           className={cn(
             "relative z-10 font-abril-fatface leading-none text-kickops-gray",
-            fonts.mentes,
+            fonts.lead,
           )}
           style={SECTION_HEADING_LEAD_STYLE}
         >
-          MENTES
+          {PEOPLE_HEADING.lead}
         </span>
         <span
           className={cn(
             "relative z-0 font-league-gothic font-black leading-none text-white",
-            fonts.pensantes,
+            fonts.display,
           )}
           style={{
             marginLeft: "-1cqw",
             ...SECTION_HEADING_TRAIL_STYLE,
           }}
         >
-          PENSANTES
+          {PEOPLE_HEADING.display}
         </span>
       </h2>
     );
@@ -63,23 +64,23 @@ export function PeopleHeading({ variant }: PeopleHeadingProps) {
         <span
           className={cn(
             "relative z-10 font-abril-fatface leading-none text-kickops-gray",
-            fonts.mentes,
+            fonts.lead,
           )}
           style={SECTION_HEADING_LEAD_STYLE}
         >
-          MENTES
+          {PEOPLE_HEADING.lead}
         </span>
         <span
           className={cn(
             "relative z-0 font-league-gothic font-black leading-none text-white",
-            fonts.pensantes,
+            fonts.display,
           )}
           style={{
             marginLeft: "-1.2cqw",
             ...SECTION_HEADING_TRAIL_STYLE,
           }}
         >
-          PENSANTES
+          {PEOPLE_HEADING.display}
         </span>
       </h2>
     </div>

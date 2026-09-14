@@ -19,10 +19,9 @@ export function ContentsMain() {
       data-globe-section="contents"
       style={SECTION_HEADING_SECTION_STYLE}
       className={cn(
-        "w-full text-kickops-gray",
+        "flex w-full min-h-fold flex-col overflow-clip text-kickops-gray",
         // Fill comes from WireframeGlobeBand (watermark sits above fill).
-        // Desktop stage fills the viewport; flow layout below xl must not leave a white void.
-        "xl:min-h-svh",
+        // overflow-clip: shaft AABBs extend past the Figma frame — keep them in this fold.
       )}
     >
       <ContentsSection parallax={layers} transitionMs={transitionMs} />

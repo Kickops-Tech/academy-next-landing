@@ -21,7 +21,7 @@ export function PeopleSection() {
         horizontal from md (rem type), phone stays stacked.
       */}
       <div className="relative hidden w-full flex-1 overflow-visible xl:block">
-        <div className="@container relative aspect-[1512/899] min-h-[100svh] w-full overflow-visible">
+        <div className="@container relative aspect-[1512/899] min-h-fold w-full overflow-visible">
           <AcademyBrain variant="desktop" />
 
           <div
@@ -51,14 +51,14 @@ export function PeopleSection() {
         Content-height stage below xl. Phone stacks; md+ is photo|copy row.
         flex-1 + min-h keeps the gray band at least one viewport with Formats.
       */}
-      <div className="@container relative flex min-h-[min(100%,20rem)] w-full flex-1 flex-col overflow-visible px-6 pb-16 xl:hidden md:px-12">
+      <div className="@container relative flex min-h-fold w-full flex-1 flex-col overflow-visible px-6 pb-16 xl:hidden md:px-12">
         <AcademyBrain variant="mobile" layout="flow" />
         <PeopleHeading variant="mobile" />
         <div
           aria-hidden={true}
           className="pointer-events-none absolute inset-x-0 bottom-0 top-[7.5rem] z-[15] bg-linear-to-t from-black/90 via-black/55 to-transparent"
         />
-        <div className="relative z-20 w-full pointer-events-auto">
+        <div className="relative z-20 w-full flex-1 pointer-events-auto">
           <PeopleCarousel layout="mobile" />
         </div>
       </div>

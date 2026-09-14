@@ -5,6 +5,11 @@ import {
   WIREFRAME_GLOBE_RADIUS,
   WIREFRAME_GLOBE_ROTATION_RAD_S,
   WIREFRAME_GLOBE_SEGMENTS,
+  WIREFRAME_GLOBE_WAVE_AMP,
+  WIREFRAME_GLOBE_WAVE_DIAGONAL,
+  WIREFRAME_GLOBE_WAVE_FREQ,
+  WIREFRAME_GLOBE_WAVE_SHARPNESS,
+  WIREFRAME_GLOBE_WAVE_SPEED,
   WIREFRAME_GLOBE_WIDTH_RATIO,
 } from "@core/constants/wireframe-globe";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
@@ -19,6 +24,15 @@ export type WireframeGlobeHandle = {
   setLineRgba: (r: number, g: number, b: number, opacity: number) => void;
   tick: (dtSeconds: number) => void;
   dispose: () => void;
+};
+
+type WaveUniforms = {
+  uWaveTime: { value: number };
+  uWaveAmp: { value: number };
+  uWaveFreq: { value: number };
+  uWaveSpeed: { value: number };
+  uWaveDiagonal: { value: number };
+  uWaveSharpness: { value: number };
 };
 
 /**
@@ -83,6 +97,72 @@ function widthFitScale(aspect: number) {
   return targetDiameter / (2 * WIREFRAME_GLOBE_RADIUS);
 }
 
+function createWaveUniformState(): WaveUniforms {
+  return {
+    uWaveTime: { value: 0 },
+    uWaveAmp: { value: WIREFRAME_GLOBE_WAVE_AMP },
+    uWaveFreq: { value: WIREFRAME_GLOBE_WAVE_FREQ },
+    uWaveSpeed: { value: WIREFRAME_GLOBE_WAVE_SPEED },
+    uWaveDiagonal: { value: WIREFRAME_GLOBE_WAVE_DIAGONAL },
+    uWaveSharpness: { value: WIREFRAME_GLOBE_WAVE_SHARPNESS },
+  };
+}
+
+/**
+ * Inject a diagonal top→bottom opacity wave into LineMaterial (screen-space lines).
+ */
+function attachOpacityWave(
+  material: LineMaterial,
+  wave: WaveUniforms,
+) {
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uWaveTime = wave.uWaveTime;
+    shader.uniforms.uWaveAmp = wave.uWaveAmp;
+    shader.uniforms.uWaveFreq = wave.uWaveFreq;
+    shader.uniforms.uWaveSpeed = wave.uWaveSpeed;
+    shader.uniforms.uWaveDiagonal = wave.uWaveDiagonal;
+    shader.uniforms.uWaveSharpness = wave.uWaveSharpness;
+
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        "#include <clipping_planes_pars_vertex>",
+        `#include <clipping_planes_pars_vertex>
+        varying vec3 vWavePos;`,
+      )
+      .replace(
+        "void main() {",
+        `void main() {
+          vWavePos = ( position.y < 0.5 ) ? instanceStart : instanceEnd;`,
+      );
+
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        "#include <clipping_planes_pars_fragment>",
+        `#include <clipping_planes_pars_fragment>
+        uniform float uWaveTime;
+        uniform float uWaveAmp;
+        uniform float uWaveFreq;
+        uniform float uWaveSpeed;
+        uniform float uWaveDiagonal;
+        uniform float uWaveSharpness;
+        varying vec3 vWavePos;`,
+      )
+      .replace(
+        "float alpha = opacity;",
+        `float alpha = opacity;
+          float axis = vWavePos.y + vWavePos.x * uWaveDiagonal;
+          float waveT = 0.5 + 0.5 * sin( axis * uWaveFreq - uWaveTime * uWaveSpeed );
+          waveT = pow( max( waveT, 0.0 ), uWaveSharpness );
+          // Thin transparent arc only — never raise alpha above theme opacity.
+          alpha *= mix( 1.0, 1.0 - uWaveAmp, waveT );
+          alpha = clamp( alpha, 0.0, 1.0 );`,
+      );
+  };
+
+  material.customProgramCacheKey = () => "wireframe-globe-opacity-wave-v3";
+  material.needsUpdate = true;
+}
+
 /**
  * Imperative Three.js wireframe globe bound to an existing canvas.
  * Uses fat screen-space lines (LineSegments2) so thickness is visible in WebGL.
@@ -122,6 +202,9 @@ export function createWireframeGlobe(
   });
   material.resolution.set(1, 1);
 
+  const wave = createWaveUniformState();
+  attachOpacityWave(material, wave);
+
   const lines = new LineSegments2(geometry, material);
   // Stronger axial tilt so the wireframe reads clearly as a globe.
   lines.rotation.x = 0.52;
@@ -130,6 +213,19 @@ export function createWireframeGlobe(
   scene.add(lines);
 
   let disposed = false;
+  const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let reducedMotion = motionQuery.matches;
+
+  const syncWaveAmp = () => {
+    wave.uWaveAmp.value = reducedMotion ? 0 : WIREFRAME_GLOBE_WAVE_AMP;
+  };
+  syncWaveAmp();
+
+  const onMotionChange = (event: MediaQueryListEvent) => {
+    reducedMotion = event.matches;
+    syncWaveAmp();
+  };
+  motionQuery.addEventListener("change", onMotionChange);
 
   return {
     setSize(width, height, dpr) {
@@ -166,7 +262,10 @@ export function createWireframeGlobe(
       if (disposed) {
         return;
       }
-      lines.rotation.y += WIREFRAME_GLOBE_ROTATION_RAD_S * dtSeconds;
+      if (!reducedMotion && dtSeconds > 0) {
+        lines.rotation.y += WIREFRAME_GLOBE_ROTATION_RAD_S * dtSeconds;
+        wave.uWaveTime.value += dtSeconds;
+      }
       renderer.render(scene, camera);
     },
 
@@ -175,6 +274,7 @@ export function createWireframeGlobe(
         return;
       }
       disposed = true;
+      motionQuery.removeEventListener("change", onMotionChange);
       scene.remove(lines);
       geometry.dispose();
       material.dispose();

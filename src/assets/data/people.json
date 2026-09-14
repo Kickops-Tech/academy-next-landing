@@ -1,0 +1,72 @@
+{
+  "section": {
+    "heading": {
+      "lead": "MENTES",
+      "display": "PENSANTES"
+    },
+    "carouselAriaLabel": "Mentes pensantes"
+  },
+  "agents": [
+    {
+      "id": "guilherme-rey",
+      "agentNumber": 1,
+      "name": "Guilherme Rey",
+      "imageSrc": "/img/people/guilherme-rey.webp",
+      "imageAlt": "Guilherme Rey",
+      "paragraphs": [
+        "CEO da Kickops, professor de Ciências da Computação no SENAC e mestrando pelo Instituto de Pesquisas Energéticas e Nucleares (IPEN).",
+        "Já passou por diversas empresas como iFood, Grupo Primo, Spiti (XP), B4A Group e Catu.",
+        "Principal idealizador dessa imersão por ter certeza que além de acreditar que a educação vai transformar o país, também tem a clareza que é hora de parar, respirar e entender como podemos usar a IA ao nosso favor, mas sem promessas falsas marketeiras."
+      ]
+    },
+    {
+      "id": "paulo-ricardo",
+      "agentNumber": 2,
+      "name": "Paulo Ricardo",
+      "imageSrc": "/img/people/paulo-ricardo.webp",
+      "imageAlt": "Paulo Ricardo",
+      "paragraphs": [
+        "CTO da Kickops e mestrando pelo Instituto de Pesquisas Tecnológicas da USP (IPT).",
+        "Vem de uma trajetória em grandes empresas como iFood e Mercado Livre.",
+        "Na Kickops, ele é um dos grandes incentivadores do uso consciente e responsável da IA. Acreditamos que, antes de automatizar, é preciso entender como as coisas são feitas. Por isso, enxergamos a Inteligência Artificial como um recurso que potencializa nosso trabalho e não como um substituto do conhecimento, do pensamento crítico e das decisões humanas."
+      ]
+    },
+    {
+      "id": "fabio-goto",
+      "agentNumber": 3,
+      "name": "Fabio Goto",
+      "imageSrc": "/img/people/fabio-goto.webp",
+      "imageAlt": "Fabio Goto",
+      "paragraphs": [
+        "Head of Front-end Engineering, Publicitário e Pós-Graduado pela FIA em Programação Full-Stack e Desenvolvimento em Linguagens Eficientes.",
+        "Atua há mais de 16 anos com tecnologia, com experiência em empresas como B4A Group, Spiti (XP Inc.) e Grupo Primo.",
+        "Na Kickops, atua principalmente com desenvolvimento front-end e mobile. Acredita que a IA tem o potencial de ampliar as capacidades de qualquer desenvolvedor, desde que seu uso seja sustentado por uma base técnica sólida e pelo domínio do tooling envolvido."
+      ]
+    },
+    {
+      "id": "gabriel-dantas",
+      "agentNumber": 4,
+      "name": "Gabriel Dantas",
+      "imageSrc": "/img/people/gabriel-dantas.webp",
+      "imageAlt": "Gabriel Dantas",
+      "paragraphs": [
+        "Head of Platform Engineering com mais de 6 anos em SRE.",
+        "Formado em Engenharia da Computação (FIAP) e cursando pós em Machine Learning Engineering, combino solidez em infraestrutura com inovação em IA/ML.",
+        "Desenvolve agentes de IA e soluções RAG para automatizar tarefas repetitivas (revisão de PRs, geração de docs, análise de incidentes)",
+        "Ele também Implementa observabilidade que conta histórias - não apenas métricas, mas insights acionáveis com Grafana, Prometheus e OpenTelemetry"
+      ]
+    },
+    {
+      "id": "gustavo-vono",
+      "agentNumber": 5,
+      "name": "Gustavo Vono",
+      "imageSrc": "/img/people/gustavo-vono.webp",
+      "imageAlt": "Gustavo Vono",
+      "paragraphs": [
+        "Head of Product Design na Kickops, formado em Publicidade pela FAAP e Pós-Graduado em Desing pela Anhembi Morumbi.",
+        "Desenvolve agentes de IA e soluções RAG para automatizar tarefas repetitivas (revisão de PRs, geração de docs, análise de incidentes)",
+        "Ele também Implementa observabilidade que conta histórias - não apenas métricas, mas insights acionáveis com Grafana, Prometheus e OpenTelemetry"
+      ]
+    }
+  ]
+}

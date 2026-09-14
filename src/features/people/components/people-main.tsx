@@ -17,7 +17,7 @@ export function PeopleMain() {
       aria-label="Mentes pensantes"
       style={SECTION_HEADING_SECTION_STYLE}
       className={cn(
-        "relative z-0 flex min-h-0 w-full flex-1 flex-col overflow-visible",
+        "relative z-0 flex w-full min-h-fold flex-col overflow-visible",
         "bg-transparent text-white",
         ACADEMY_BRAIN_GLITCH_ENABLED && "pointer-events-none",
       )}

@@ -1,6 +1,6 @@
-import type { PeopleAgent } from "@features/people/constants/people-agents";
+import { PeopleAgentPhoto } from "@features/people/components/people-agent-photo";
+import type { PeopleAgent } from "@features/people/constants/people-content";
 import { cn } from "@shadcn/lib/utils";
-import Image from "next/image";
 
 type PeopleAgentSlideProps = {
   agent: PeopleAgent;
@@ -32,49 +32,25 @@ export function PeopleAgentSlide({
     >
       <div
         className={cn(
-          "relative isolate shrink-0 overflow-hidden bg-white",
+          "relative isolate shrink-0",
           isDesktop
             ? "size-[29.89cqw]"
             : "aspect-square w-full md:w-[min(42%,17.5rem)]",
         )}
       >
-        <Image
+        <PeopleAgentPhoto
           src={agent.imageSrc}
           alt={agent.imageAlt}
-          fill
-          className="object-cover object-[center_20%]"
-          sizes={
-            isDesktop
-              ? "30vw"
-              : "(max-width: 767px) 20rem, (max-width: 1279px) 17.5rem, 24rem"
-          }
+          isDesktop={isDesktop}
         />
-        {/* Stamp inset 16px from photo edges on every breakpoint. */}
-        <div
-          aria-hidden
-          className={cn(
-            "absolute bottom-4 left-4 z-10 flex items-center justify-center bg-kickops-gray",
-            isDesktop ? "size-[3.97cqw]" : "size-15",
-          )}
-        >
-          <Image
-            src="/img/people/arrow-up-right.svg"
-            alt=""
-            width={40}
-            height={40}
-            className={cn(
-              "max-w-none",
-              isDesktop ? "size-[2.65cqw]" : "size-10",
-            )}
-            unoptimized
-          />
-        </div>
       </div>
 
       <div
         className={cn(
           "flex flex-col gap-4 leading-[1.4]",
-          isDesktop ? "w-[29.7cqw] pt-[3.64cqw]" : "w-full md:min-w-0 md:flex-1 md:pt-1",
+          isDesktop
+            ? "w-[29.7cqw] pt-[3.64cqw]"
+            : "w-full md:min-w-0 md:flex-1 md:pt-1",
         )}
       >
         <div className="flex flex-col gap-px font-bold">

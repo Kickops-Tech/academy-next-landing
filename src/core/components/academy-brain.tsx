@@ -50,7 +50,6 @@ function stageBoxStyle(variant: AcademyBrainVariant): CSSProperties {
 const FLOW_BOX_STYLE: CSSProperties = {
   left: "50%",
   top: "0%",
-  width: ACADEMY_BRAIN_FLOW.width,
   aspectRatio: "1 / 1",
   transform: `translate(-50%, ${ACADEMY_BRAIN_FLOW.shiftY})`,
 };
@@ -63,6 +62,10 @@ function boxStyle(
     return FLOW_BOX_STYLE;
   }
   return stageBoxStyle(variant);
+}
+
+function boxClassName(layout: AcademyBrainLayout) {
+  return cn("absolute", layout === "flow" && ACADEMY_BRAIN_FLOW.widthClass);
 }
 
 /**
@@ -144,7 +147,7 @@ function AcademyBrainStatic({
       className={cn("pointer-events-none absolute inset-0 z-0 overflow-visible")}
       style={PARALLAX_WRAPPER_STYLE}
     >
-      <div className="absolute" style={boxStyle(variant, layout)}>
+      <div className={boxClassName(layout)} style={boxStyle(variant, layout)}>
         <Image
           src={ACADEMY_BRAIN_IMAGE}
           alt=""
@@ -196,7 +199,8 @@ function AcademyBrainGlitch({
       <div
         ref={containerRef}
         className={cn(
-          "absolute overflow-hidden",
+          boxClassName(layout),
+          "overflow-hidden",
           !useFallback && "pointer-events-auto cursor-crosshair",
         )}
         style={boxStyle(variant, layout)}

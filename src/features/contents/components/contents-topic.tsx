@@ -20,18 +20,18 @@ export function ContentsTopicCard({
   pulseDelayMs = 0,
   iconSize = "fluid",
 }: ContentsTopicProps) {
-  const iconStyle: CSSProperties =
-    iconSize === "fluid"
-      ? {
-          width: `${CONTENTS_TOPIC_CARD.iconCqw}cqw`,
-          height: `${CONTENTS_TOPIC_CARD.iconCqw}cqw`,
-          animationDelay: `${pulseDelayMs}ms`,
-        }
-      : {
-          width: 56,
-          height: 56,
-          animationDelay: `${pulseDelayMs}ms`,
-        };
+  const fluid = iconSize === "fluid";
+  const iconStyle: CSSProperties = fluid
+    ? {
+        width: `${CONTENTS_TOPIC_CARD.iconCqw}cqw`,
+        height: `${CONTENTS_TOPIC_CARD.iconCqw}cqw`,
+        animationDelay: `${pulseDelayMs}ms`,
+      }
+    : {
+        width: 56,
+        height: 56,
+        animationDelay: `${pulseDelayMs}ms`,
+      };
 
   return (
     <article
@@ -51,16 +51,26 @@ export function ContentsTopicCard({
 
       <p
         className={cn(
-          "font-sans text-[12px] font-bold leading-[1.4] text-kickops-gray",
-          iconSize === "fluid" ? "mt-[1.85cqw]" : "mt-4",
+          "font-sans font-bold leading-[1.4] text-kickops-gray",
+          fluid ? "mt-[1.85cqw] text-[0.7cqw]" : "mt-4 text-[12px]",
         )}
       >
         {topic.label}
       </p>
-      <h3 className="font-sans text-[18px] font-bold leading-[1.4] text-kickops-gray">
+      <h3
+        className={cn(
+          "font-sans font-bold leading-[1.4] text-kickops-gray",
+          fluid ? "text-[1.05cqw]" : "text-[18px]",
+        )}
+      >
         {topic.title}
       </h3>
-      <p className="mt-4 font-sans text-[14px] font-normal leading-[1.4] text-kickops-gray">
+      <p
+        className={cn(
+          "font-sans font-normal leading-[1.4] text-kickops-gray",
+          fluid ? "mt-[1.06cqw] text-[0.815cqw]" : "mt-4 text-[14px]",
+        )}
+      >
         {topic.description}
       </p>
     </article>

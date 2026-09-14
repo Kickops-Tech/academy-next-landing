@@ -1,5 +1,3 @@
-"use client";
-
 import { ContentsColumns } from "@features/contents/components/contents-columns";
 import { ContentsColumnsStrip } from "@features/contents/components/contents-columns-strip";
 import { ContentsHeading } from "@features/contents/components/contents-heading";
@@ -21,11 +19,12 @@ export function ContentsSection({
   return (
     <div className="relative w-full">
       {/*
-        Desktop stage is full viewport width (no max-w). Below xl the absolute
-        topic cards shrink too hard — keep the mobile carousel through mid widths.
+        Full-bleed desktop stage (no max-w shell). Topic type still scales via
+        stage cqw; side gutters from a centered cap are intentional elsewhere,
+        not here — columns need edge-to-edge.
       */}
       <div className="relative hidden w-full xl:block">
-        <div className="@container relative aspect-[1512/982] min-h-svh w-full overflow-x-clip">
+        <div className="@container relative aspect-[1512/982] min-h-fold w-full overflow-clip">
           <ContentsColumns
             variant="desktop"
             parallax={parallax}
@@ -49,7 +48,7 @@ export function ContentsSection({
         (715:2054 phone / 659:435 tablet), height-capped so width doesn’t
         invent a tall empty stage.
       */}
-      <div className="@container relative w-full overflow-hidden xl:hidden">
+      <div className="@container relative flex min-h-fold w-full flex-col overflow-hidden xl:hidden">
         <ContentsHeading variant="mobile" />
         <div className="relative z-20">
           <ContentsTopicsCarousel />
@@ -58,13 +57,13 @@ export function ContentsSection({
           variant="mobile"
           parallax={parallax}
           transitionMs={transitionMs}
-          className="mt-2 md:hidden"
+          className="mt-auto md:hidden"
         />
         <ContentsColumnsStrip
           variant="desktop"
           parallax={parallax}
           transitionMs={transitionMs}
-          className="mt-3 hidden md:block"
+          className="mt-auto hidden md:block"
         />
       </div>
     </div>

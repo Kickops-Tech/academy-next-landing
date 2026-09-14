@@ -42,6 +42,18 @@ export const WIREFRAME_GLOBE_WIDTH_RATIO = 0.7;
  */
 export const WIREFRAME_GLOBE_THEME_FADE_S = 0.45;
 
+/**
+ * Opacity wave — thin transparent arc (top→bottom, slight diagonal).
+ * Only lowers alpha; base theme opacity is the ceiling (never brighter than static).
+ * Sharpness > 1 thins the transparent ridge.
+ */
+export const WIREFRAME_GLOBE_WAVE_AMP = 0.65;
+export const WIREFRAME_GLOBE_WAVE_FREQ = 1.15;
+export const WIREFRAME_GLOBE_WAVE_SPEED = 1.15;
+export const WIREFRAME_GLOBE_WAVE_SHARPNESS = 10;
+/** Weight of local X mixed into the wave axis (0 = pure vertical). */
+export const WIREFRAME_GLOBE_WAVE_DIAGONAL = 0.35;
+
 /** Line colors / opacity per section theme (CSS hex + alpha 0–1). */
 export const WIREFRAME_GLOBE_THEME = {
   target: {
@@ -55,7 +67,7 @@ export const WIREFRAME_GLOBE_THEME = {
     lineOpacity: 0.015,
   },
   formats: {
-    fillClassName: "bg-kickops-gray",
+    fillClassName: "wireframe-globe-fill-formats",
     lineColor: "#f5f5f5",
     lineOpacity: 0.035,
   },

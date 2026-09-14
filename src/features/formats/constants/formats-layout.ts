@@ -15,9 +15,16 @@ export type FormatsLayoutVariant = "desktop" | "mobile";
 export const FORMATS_MOBILE_BLOCK_WIDTH = 260;
 export const FORMATS_MOBILE_BLOCK_GAP = 20;
 
-/** Desktop block left edges (Figma). */
+/** Desktop block left edges (Figma 918:286). */
 export const FORMATS_DESKTOP_BLOCK_LEFT = {
   formato: 199,
   conteudo: 577,
   investimento: 955,
+} as const;
+
+/** Vertical positions in desktop frame (timeline above cards). */
+export const FORMATS_DESKTOP_TOP = {
+  timeline: 335,
+  blocks: 500,
+  cta: 780,
 } as const;

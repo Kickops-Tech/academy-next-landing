@@ -1,59 +1,84 @@
 "use client";
 
 import { PeopleAgentSlide } from "@features/people/components/people-agent-slide";
-import { PEOPLE_AGENTS } from "@features/people/constants/people-agents";
 import {
-  PEOPLE_CAROUSEL_MS,
-  PEOPLE_CAROUSEL_SWIPE_X,
-} from "@features/people/constants/people-layout";
+  PEOPLE_AGENTS,
+  PEOPLE_CAROUSEL_ARIA_LABEL,
+} from "@features/people/constants/people-content";
+import { PEOPLE_CAROUSEL_MS } from "@features/people/constants/people-layout";
 import { usePeopleCarousel } from "@features/people/hooks/use-people-carousel";
 import { cn } from "@shadcn/lib/utils";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 
 type PeopleCarouselProps = {
   layout: "desktop" | "mobile";
   className?: string;
 };
 
+const STRIP_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+
+/** Ease progress for opacity so fades reach 0/1 without a hard cut. */
+function smoothstep(t: number) {
+  const x = Math.min(1, Math.max(0, t));
+  return x * x * (3 - 2 * x);
+}
+
 export function PeopleCarousel({ layout, className }: PeopleCarouselProps) {
   const {
     index,
-    direction,
-    visible,
     agent,
+    neighbor,
+    offsetPx,
+    isDragging,
+    snapPose,
+    progress,
+    stridePx,
+    peekDir,
+    setTrackWidth,
     goToIndex,
-    onTouchStart,
-    onTouchEnd,
+    beginPointerGesture,
   } = usePeopleCarousel();
 
-  // After index swaps while hidden, start off-canvas on the enter side, then settle.
-  const [enterOffset, setEnterOffset] = useState(false);
+  const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!visible) {
-      setEnterOffset(true);
+    const track = trackRef.current;
+    if (!track) {
       return;
     }
-    const id = window.requestAnimationFrame(() => {
-      setEnterOffset(false);
-    });
-    return () => window.cancelAnimationFrame(id);
-  }, [visible, index]);
 
-  const exitX =
-    direction === 1
-      ? `-${PEOPLE_CAROUSEL_SWIPE_X}`
-      : PEOPLE_CAROUSEL_SWIPE_X;
-  const enterX =
-    direction === 1
-      ? PEOPLE_CAROUSEL_SWIPE_X
-      : `-${PEOPLE_CAROUSEL_SWIPE_X}`;
+    const syncWidth = () => setTrackWidth(track.getBoundingClientRect().width);
+    syncWidth();
 
-  let transform = "translateX(0)";
-  if (!visible) {
-    transform = `translateX(${exitX})`;
-  } else if (enterOffset) {
-    transform = `translateX(${enterX})`;
+    const observer = new ResizeObserver(syncWidth);
+    observer.observe(track);
+    return () => observer.disconnect();
+  }, [setTrackWidth]);
+
+  const neighborShift =
+    peekDir === 1 ? stridePx : peekDir === -1 ? -stridePx : 0;
+
+  const transition =
+    isDragging || snapPose
+      ? "none"
+      : `transform ${PEOPLE_CAROUSEL_MS}ms ${STRIP_EASE}, opacity ${PEOPLE_CAROUSEL_MS}ms ${STRIP_EASE}`;
+
+  // Full crossfade 1↔0 (smoothstep) — no residual opacity that then “pops” away.
+  const fade = smoothstep(progress);
+  const currentOpacity = 1 - fade;
+  const neighborOpacity = fade;
+
+  function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    if (event.button !== 0) {
+      return;
+    }
+    // Capture is optional; window listeners guarantee release settles.
+    event.currentTarget.setPointerCapture(event.pointerId);
+    beginPointerGesture(event.clientX, event.pointerId);
   }
 
   return (
@@ -64,32 +89,44 @@ export function PeopleCarousel({ layout, className }: PeopleCarouselProps) {
       )}
     >
       <div
-        className="w-full touch-pan-y select-none overflow-hidden"
-        onTouchStart={(event) =>
-          onTouchStart(event.changedTouches[0]?.clientX ?? 0)
-        }
-        onTouchEnd={(event) =>
-          onTouchEnd(event.changedTouches[0]?.clientX ?? 0)
-        }
+        ref={trackRef}
+        className={cn(
+          "relative w-full touch-pan-y select-none overflow-visible",
+          layout === "desktop" && "cursor-grab",
+          layout === "desktop" && isDragging && "cursor-grabbing",
+        )}
+        onPointerDown={handlePointerDown}
       >
         <div
-          className="will-change-[opacity,transform]"
+          className="relative w-full will-change-[opacity,transform]"
           style={{
-            transition: enterOffset
-              ? "none"
-              : `opacity ${PEOPLE_CAROUSEL_MS}ms cubic-bezier(0.22, 1, 0.36, 1), transform ${PEOPLE_CAROUSEL_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`,
-            opacity: visible && !enterOffset ? 1 : 0,
-            transform,
+            transition,
+            transform: `translateX(${offsetPx}px)`,
+            opacity: currentOpacity,
           }}
         >
           <PeopleAgentSlide agent={agent} layout={layout} />
         </div>
+
+        {neighbor ? (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 will-change-[opacity,transform]"
+            style={{
+              transition,
+              transform: `translateX(${offsetPx + neighborShift}px)`,
+              opacity: neighborOpacity,
+            }}
+          >
+            <PeopleAgentSlide agent={neighbor} layout={layout} />
+          </div>
+        ) : null}
       </div>
 
       <div
         className="mt-8 flex items-center gap-3"
         role="tablist"
-        aria-label="Agentes"
+        aria-label={PEOPLE_CAROUSEL_ARIA_LABEL}
       >
         {PEOPLE_AGENTS.map((item, dotIndex) => {
           const active = dotIndex === index;
@@ -99,7 +136,7 @@ export function PeopleCarousel({ layout, className }: PeopleCarouselProps) {
               type="button"
               role="tab"
               aria-selected={active}
-              aria-label={`Agente ${item.agentNumber}`}
+              aria-label={`${item.name}, agente ${item.agentNumber}`}
               className={cn(
                 "size-3 rounded-full transition-colors",
                 active ? "bg-kickops-yellow" : "bg-[#666666]",

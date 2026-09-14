@@ -6,26 +6,50 @@ type FormatsBlockCardProps = {
   block: FormatsBlock;
   className?: string;
   style?: CSSProperties;
+  /** `fluid` = stage cqw (desktop); `fixed` = px (mobile carousel). */
+  density?: "fluid" | "fixed";
 };
 
 export function FormatsBlockCard({
   block,
   className,
   style,
+  density = "fixed",
 }: FormatsBlockCardProps) {
+  const fluid = density === "fluid";
+
   return (
     <article
       className={cn("flex w-full flex-col gap-0 leading-[1.4]", className)}
       style={style}
     >
-      <p className="text-[12px] font-bold text-kickops-yellow">{block.eyebrow}</p>
-      <h3 className="mt-[12px] text-[18px] font-bold text-white">{block.title}</h3>
-      <div className="mt-[16px] flex flex-col gap-4">
+      <p
+        className={cn(
+          "font-bold text-kickops-yellow",
+          fluid ? "text-[0.794cqw]" : "text-[12px]",
+        )}
+      >
+        {block.eyebrow}
+      </p>
+      <h3
+        className={cn(
+          "font-bold text-white",
+          fluid ? "mt-[0.794cqw] text-[1.19cqw]" : "mt-[12px] text-[18px]",
+        )}
+      >
+        {block.title}
+      </h3>
+      <div
+        className={cn(
+          "flex flex-col",
+          fluid ? "mt-[1.06cqw] gap-[1.06cqw]" : "mt-[16px] gap-4",
+        )}
+      >
         {block.paragraphs.map((paragraph) => (
           <p
             key={paragraph.text}
             className={cn(
-              "text-[14px]",
+              fluid ? "text-[0.926cqw]" : "text-[14px]",
               paragraph.accent ? "text-kickops-yellow" : "text-white",
             )}
           >

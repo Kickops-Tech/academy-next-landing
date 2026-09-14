@@ -17,7 +17,7 @@ export function TargetMain() {
       data-globe-section="target"
       style={SECTION_HEADING_SECTION_STYLE}
       className={cn(
-        "flex w-full min-h-svh flex-col justify-center",
+        "flex w-full min-h-fold flex-col justify-center",
         // Fill comes from WireframeGlobeBand (watermark sits above fill).
         "text-kickops-gray",
       )}

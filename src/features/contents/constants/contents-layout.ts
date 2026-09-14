@@ -62,12 +62,19 @@ export function figmaBoxStyle(
   };
 }
 
-/** Topic card shell — icon scales via cqw in the component. */
+/** Topic card shell — icon/type scale via stage `cqw` on desktop. */
 export const CONTENTS_TOPIC_CARD = {
   width: 228,
   height: 268,
   /** Visual size vs Figma 90px — reduced (~64px @ 1512). */
   iconCqw: 4.23,
+  /**
+   * Type vs stage width — ~88% of Figma 12/18/14 @ 1512 so wide
+   * viewports grow slower and body copy clears the column art.
+   */
+  labelCqw: 0.7,
+  titleCqw: 1.05,
+  bodyCqw: 0.815,
 } as const;
 
 export const CONTENTS_DESKTOP_LAYOUT = {
@@ -174,8 +181,7 @@ export const CONTENTS_MOBILE_TOPIC_GAP =
   296 - 16 - CONTENTS_TOPIC_CARD.width;
 
 /**
- * Prefer distribution over shrink: keep art large, fan out from center,
- * mask still clears the topic band.
+ * Composition scale vs Figma boxes. Pointer parallax stays independent.
  *
  * Desktop base scale is height-clamped on short viewports (see
  * {@link getContentsColumnScale}) so shafts stay visible without hard crops.

@@ -19,10 +19,11 @@ export const ACADEMY_BRAIN_PIXELATE_MASK_STAMP_STRENGTH = 255;
 
 export const ACADEMY_BRAIN = {
   desktop: {
-    left: -101,
+    left: -20,
     // Figma -517; nudged down so more crown sits in People / less in Formats.
-    topPeople: -400,
-    size: 1616,
+    // Size ~10% under Figma 1616; left/top recentered on the old box.
+    topPeople: -319,
+    size: 1454,
     frameWidth: 1512,
     peopleFrameHeight: 899,
   },
@@ -46,9 +47,10 @@ export type AcademyBrainLayout = "stage" | "flow";
 /**
  * Flow (md/phone People): pull crown into the heading/carousel band.
  * Width mirrors Figma mobile ~997/393 ≈ 254vw, capped for tablet.
+ * From lg: ~10% smaller so the silhouette doesn’t dominate.
  */
 export const ACADEMY_BRAIN_FLOW = {
-  width: "min(254vw, 90rem)",
+  widthClass: "w-[min(254vw,90rem)] lg:w-[min(229vw,81rem)]",
   /** % of box height — negative pulls the silhouette upward. */
   shiftY: "-16%",
 } as const;

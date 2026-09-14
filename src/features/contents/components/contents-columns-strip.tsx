@@ -2,9 +2,10 @@
 
 import { ContentsColumns } from "@features/contents/components/contents-columns";
 import {
-  CONTENTS_COLUMNS_BAND_MASK,
   CONTENTS_COLUMNS_BAND_SCALE,
+  CONTENTS_COLUMNS_STRIP_EDGE_MASK,
   getContentsColumnBandHeight,
+  getContentsColumnBandWidthAspect,
 } from "@features/contents/constants/contents-columns-strip";
 import {
   getContentsFrame,
@@ -33,21 +34,21 @@ export function ContentsColumnsStrip({
 }: ContentsColumnsStripProps) {
   const frame = getContentsFrame(variant);
   const bandHeight = getContentsColumnBandHeight(variant);
+  const bandAspect = getContentsColumnBandWidthAspect(variant);
 
   return (
     <div
       aria-hidden
       className={cn(
         "relative w-full overflow-hidden",
-        // Cap height by viewport width so tablet doesn’t grow a phone-aspect void.
-        variant === "mobile"
-          ? "h-[clamp(11rem,50vw,17rem)]"
-          : "h-[clamp(13rem,28vw,22rem)]",
+        // Figma band aspect (width → height); tablet needs more room for crowns.
+        variant === "mobile" ? "max-h-[52svh]" : "max-h-[50svh]",
         className,
       )}
       style={{
-        maskImage: CONTENTS_COLUMNS_BAND_MASK,
-        WebkitMaskImage: CONTENTS_COLUMNS_BAND_MASK,
+        height: `calc(100cqw * ${bandAspect})`,
+        maskImage: CONTENTS_COLUMNS_STRIP_EDGE_MASK,
+        WebkitMaskImage: CONTENTS_COLUMNS_STRIP_EDGE_MASK,
       }}
     >
       {/*
@@ -66,6 +67,7 @@ export function ContentsColumnsStrip({
           transitionMs={transitionMs}
           fadeTop={false}
           compositionScale={CONTENTS_COLUMNS_BAND_SCALE}
+          spread={1}
         />
       </div>
     </div>

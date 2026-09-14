@@ -23,10 +23,15 @@ type ContentsColumnsProps = {
   variant: ContentsLayoutVariant;
   parallax: ContentsColumnParallaxState;
   transitionMs: number;
-  /** Soft top mask (default). Set false when columns sit in a strip under copy. */
+  /** Soft top mask. Off by default — Figma shows full shaft tops without a veil. */
   fadeTop?: boolean;
   /** Overrides measured composition scale (strip / special stages). */
   compositionScale?: number;
+  /**
+   * Overrides width-based fan-out. Flow strips lock to 1 so tablet widths
+   * don’t push Figma shafts off-screen (narrowSpread was ~1.45–1.55).
+   */
+  spread?: number;
 };
 
 function outerParallaxStyle(
@@ -80,12 +85,14 @@ export function ContentsColumns({
   variant,
   parallax,
   transitionMs,
-  fadeTop = true,
+  fadeTop = false,
   compositionScale: compositionScaleProp,
+  spread: spreadProp,
 }: ContentsColumnsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const spread = useContentsColumnSpread(containerRef, variant);
+  const measuredSpread = useContentsColumnSpread(containerRef, variant);
   const measuredScale = useContentsColumnScale(containerRef, variant);
+  const spread = spreadProp ?? measuredSpread;
   const compositionScale = compositionScaleProp ?? measuredScale;
   const frame = getContentsFrame(variant);
   const columns = getContentsColumns(variant);
@@ -95,9 +102,7 @@ export function ContentsColumns({
     <div
       ref={containerRef}
       className={cn(
-        "pointer-events-none absolute inset-0 z-0",
-        // Desktop: avoid hard AABB clips on rotated shafts (diagonal cuts).
-        variant === "desktop" ? "overflow-visible" : "overflow-hidden",
+        "pointer-events-none absolute inset-0 z-0 overflow-hidden",
       )}
     >
       <ColumnGlows variant={variant} />

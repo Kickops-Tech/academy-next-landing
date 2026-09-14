@@ -9,9 +9,9 @@ import {
   SECTION_HEADING_ENTER_VIEWPORT_START,
   SECTION_HEADING_EXIT_EXPONENT,
   SECTION_HEADING_EXIT_LEAD_TRANSLATE_VH,
+  SECTION_HEADING_EXIT_OUT_FRACTION_END,
+  SECTION_HEADING_EXIT_OUT_FRACTION_START,
   SECTION_HEADING_EXIT_TRAIL_TRANSLATE_VH,
-  SECTION_HEADING_EXIT_VIEWPORT_END,
-  SECTION_HEADING_EXIT_VIEWPORT_START,
   SECTION_HEADING_SCROLL_LEAD_TRANSLATE_VH,
   SECTION_HEADING_SCROLL_TRAIL_TRANSLATE_VH,
 } from "@core/constants/section-heading-parallax";
@@ -60,8 +60,7 @@ function applyHidden(section: HTMLElement) {
 /**
  * Enter: lead ← / trail → + fade-in.
  * Scroll: vertical parallax (different speeds).
- * Exit: keep rising + fade-out (no horizontal slide-out) — delayed until
- * the section top is near the viewport edge.
+ * Exit: fade starts when the heading is ~50% above the viewport top.
  * Mutates CSS vars on `sectionRef` — no React re-renders on scroll.
  */
 export function useSectionHeadingParallax(
@@ -76,6 +75,7 @@ export function useSectionHeadingParallax(
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     let reducedMotion = motionQuery.matches;
     let lastKey = "";
+    const heading = section.querySelector("h2");
 
     const update = () => {
       if (reducedMotion) {
@@ -121,14 +121,19 @@ export function useSectionHeadingParallax(
         ),
         SECTION_HEADING_ENTER_EXPONENT,
       );
+
+      const headingRect = heading?.getBoundingClientRect() ?? rect;
+      const headingHeight = Math.max(headingRect.height, 1);
+      const headingMidY = headingRect.top + headingHeight * 0.5;
+      const exitStartY =
+        headingHeight * (0.5 - SECTION_HEADING_EXIT_OUT_FRACTION_START);
+      const exitEndY =
+        headingHeight * (0.5 - SECTION_HEADING_EXIT_OUT_FRACTION_END);
       const exit = Math.pow(
-        progressBetween(
-          rect.top,
-          viewportHeight * SECTION_HEADING_EXIT_VIEWPORT_START,
-          viewportHeight * SECTION_HEADING_EXIT_VIEWPORT_END,
-        ),
+        progressBetween(headingMidY, exitStartY, exitEndY),
         SECTION_HEADING_EXIT_EXPONENT,
       );
+
       const scroll = clamp01(-rect.top / Math.max(rect.height, 1));
       const vh = viewportHeight / 100;
       const offsetPx =

@@ -1,5 +1,6 @@
 "use client";
 
+import { FOLD_STAGE_SHELL_CLASS } from "@core/constants/fold-stage";
 import { TargetCard } from "@features/target/components/target-card";
 import { TargetCorporateCardContent } from "@features/target/components/target-corporate-card-content";
 import { TargetDrawerContent } from "@features/target/components/target-drawer-content";
@@ -107,7 +108,7 @@ export function TargetAudienceSection() {
     <>
       <div
         className={cn(
-          "mx-auto w-full max-w-[94.5rem]",
+          FOLD_STAGE_SHELL_CLASS,
           "py-10 md:py-12",
         )}
       >
