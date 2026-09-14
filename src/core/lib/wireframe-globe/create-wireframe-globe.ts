@@ -116,7 +116,7 @@ export function createWireframeGlobe(
     color: new Color("#121212"),
     linewidth: WIREFRAME_GLOBE_LINE_WIDTH_PX,
     transparent: true,
-    opacity: 0.16,
+    opacity: 0.09,
     depthWrite: false,
     worldUnits: false,
   });

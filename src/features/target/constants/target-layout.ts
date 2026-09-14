@@ -188,15 +188,16 @@ const TECH_MOBILE_H = 378;
 export const TARGET_TECH_CARD_LAYOUT: Record<TargetLayoutVariant, TechCardLayout> = {
   desktop: {
     image: normBox(237, -27, 346, 230, TECH_DESKTOP_W, TECH_DESKTOP_H),
-    label: normText(32, 79, TECH_DESKTOP_W, TECH_DESKTOP_H),
-    title: normText(32, 108, TECH_DESKTOP_W, TECH_DESKTOP_H, 194),
-    description: normText(32, 174, TECH_DESKTOP_W, TECH_DESKTOP_H, 280),
+    // Raised vs Figma so a 3-line body still keeps ~32px bottom inset.
+    label: normText(32, 58, TECH_DESKTOP_W, TECH_DESKTOP_H),
+    title: normText(32, 87, TECH_DESKTOP_W, TECH_DESKTOP_H, 221),
+    description: normText(32, 148, TECH_DESKTOP_W, TECH_DESKTOP_H, 308),
   },
   mobile: {
     image: normBox(12, -43, 346, 230, TECH_MOBILE_W, TECH_MOBILE_H),
     label: normText(32, 207, TECH_MOBILE_W, TECH_MOBILE_H),
-    title: normText(32, 236, TECH_MOBILE_W, TECH_MOBILE_H, 194),
-    description: normText(32, 302, TECH_MOBILE_W, TECH_MOBILE_H, 280),
+    title: normText(32, 236, TECH_MOBILE_W, TECH_MOBILE_H, 221),
+    description: normText(32, 302, TECH_MOBILE_W, TECH_MOBILE_H, 308),
   },
 };
 

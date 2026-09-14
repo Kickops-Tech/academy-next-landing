@@ -47,6 +47,11 @@ export interface UseImageGlitchOptions {
   fit?: ImageGlitchFit;
   proceduralPixelate?: boolean;
   enableHoverPixelate?: boolean;
+  /**
+   * Episodic CRT / slice bursts. When false, image stays clean and only
+   * hover pixelate (if enabled) runs.
+   */
+  enableEpisodicGlitch?: boolean;
   config?: GlitchGridConfig;
   pixelateBlockPx?: number;
   pixelateStampBlockSpan?: number;
@@ -79,6 +84,7 @@ export function useImageGlitch(
     fit = "contain",
     proceduralPixelate = false,
     enableHoverPixelate = true,
+    enableEpisodicGlitch = true,
     config = DEFAULT_GLITCH_CONFIG,
     pixelateBlockPx = 48,
     pixelateStampBlockSpan = 3,
@@ -114,6 +120,8 @@ export function useImageGlitch(
   const trailDimensionsRef = useRef({ cols: 0, rows: 0 });
   const enableHoverPixelateRef = useRef(enableHoverPixelate);
   enableHoverPixelateRef.current = enableHoverPixelate;
+  const enableEpisodicGlitchRef = useRef(enableEpisodicGlitch);
+  enableEpisodicGlitchRef.current = enableEpisodicGlitch;
 
   const layersKey = layers.join("|");
 
@@ -391,7 +399,7 @@ export function useImageGlitch(
           return;
         }
 
-        if (!reducedMotionRef.current) {
+        if (!reducedMotionRef.current && enableEpisodicGlitchRef.current) {
           const prevPhase = burstStateRef.current?.phase ?? "idle";
           const burst = tickGlitchBurst(
             burstStateRef.current ??
@@ -430,6 +438,8 @@ export function useImageGlitch(
             gridRef.current.cols,
             gridRef.current.rows,
           );
+        } else {
+          glitchMixRef.current = 0;
         }
 
         if (enableHoverPixelateRef.current && trailRef.current) {
@@ -649,6 +659,7 @@ export function useImageGlitch(
     fit,
     proceduralPixelate,
     enableHoverPixelate,
+    enableEpisodicGlitch,
     config,
     pixelateBlockPx,
     pixelateStampBlockSpan,

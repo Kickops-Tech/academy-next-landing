@@ -20,16 +20,20 @@ export const SECTION_HEADING_SCROLL_TRAIL_TRANSLATE_VH = 14;
 export const SECTION_HEADING_EXIT_LEAD_TRANSLATE_VH = 5;
 export const SECTION_HEADING_EXIT_TRAIL_TRANSLATE_VH = 8;
 
-/** Viewport: entrada (fração da altura). */
-export const SECTION_HEADING_ENTER_VIEWPORT_START = 0.92;
-export const SECTION_HEADING_ENTER_VIEWPORT_END = 0.52;
+/**
+ * Viewport: entrada (fração da altura) — começa mais alto para o título
+ * não aparecer cedo demais enquanto a dobra ainda sobe.
+ */
+export const SECTION_HEADING_ENTER_VIEWPORT_START = 0.52;
+export const SECTION_HEADING_ENTER_VIEWPORT_END = 0.12;
 
 /**
- * Viewport: fade-out pelo topo — começa só quando o topo da seção
- * chega perto da borda (antes sumia cedo demais em ~0.22).
+ * Viewport: fade-out pelo topo — o título fica abaixo do topo da seção,
+ * então o fade só começa depois que o bloco já saiu bastante da tela
+ * (parallax de scroll continua independente).
  */
-export const SECTION_HEADING_EXIT_VIEWPORT_START = 0.02;
-export const SECTION_HEADING_EXIT_VIEWPORT_END = -0.42;
+export const SECTION_HEADING_EXIT_VIEWPORT_START = -0.35;
+export const SECTION_HEADING_EXIT_VIEWPORT_END = -0.95;
 
 /** CSS custom properties written on the section element. */
 export const SECTION_HEADING_CSS = {

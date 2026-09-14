@@ -2,6 +2,7 @@
 
 import {
   ACADEMY_BRAIN,
+  ACADEMY_BRAIN_EPISODIC_GLITCH,
   ACADEMY_BRAIN_FLOW,
   ACADEMY_BRAIN_GLITCH_ENABLED,
   ACADEMY_BRAIN_IMAGE,
@@ -176,6 +177,7 @@ function AcademyBrainGlitch({
     fit: "cover",
     proceduralPixelate: true,
     enableHoverPixelate: true,
+    enableEpisodicGlitch: ACADEMY_BRAIN_EPISODIC_GLITCH,
     pixelateBlockPx: ACADEMY_BRAIN_PIXELATE_BLOCK_PX,
     pixelateStampBlockSpan: ACADEMY_BRAIN_PIXELATE_STAMP_BLOCK_SPAN,
     pixelateMaskDecay: ACADEMY_BRAIN_PIXELATE_MASK_DECAY,

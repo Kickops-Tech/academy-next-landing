@@ -4,8 +4,11 @@
  * Below xl: flow layout (short content box can’t use raw Figma %).
  */
 
-/** Set false to restore static brain (no WebGL / no pointer-events passthrough). */
+/** Set false for static brain (no WebGL). When true, WebGL + hover pixelate. */
 export const ACADEMY_BRAIN_GLITCH_ENABLED = true;
+
+/** Episodic CRT/slice bursts — off keeps clean image + hover pixelate only. */
+export const ACADEMY_BRAIN_EPISODIC_GLITCH = false;
 
 export const ACADEMY_BRAIN_IMAGE = "/img/people/brain.png";
 

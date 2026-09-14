@@ -13,7 +13,7 @@ export const WIREFRAME_GLOBE_SEGMENTS = 48;
 export const WIREFRAME_GLOBE_ROTATION_RAD_S = 0.08;
 
 /** Screen-space line thickness (px) — fat lines via LineSegments2. */
-export const WIREFRAME_GLOBE_LINE_WIDTH_PX = 1.5;
+export const WIREFRAME_GLOBE_LINE_WIDTH_PX = 2.75;
 
 /** Cap devicePixelRatio — watermark does not need retina sharpness. */
 export const WIREFRAME_GLOBE_DPR_CAP_DESKTOP = 1.5;
@@ -47,17 +47,17 @@ export const WIREFRAME_GLOBE_THEME = {
   target: {
     fillClassName: "bg-kickops-yellow",
     lineColor: "#121212",
-    lineOpacity: 0.16,
+    lineOpacity: 0.09,
   },
   contents: {
     fillClassName: "bg-white",
     lineColor: "#121212",
-    lineOpacity: 0.14,
+    lineOpacity: 0.015,
   },
   formats: {
     fillClassName: "bg-kickops-gray",
     lineColor: "#f5f5f5",
-    lineOpacity: 0.18,
+    lineOpacity: 0.035,
   },
 } as const satisfies Record<
   WireframeGlobeTheme,
