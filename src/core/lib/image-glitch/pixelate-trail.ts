@@ -80,3 +80,12 @@ export function decayPixelateTrail(trail: PixelateTrail, amount = 4): void {
     else pixels[i] -= amount;
   }
 }
+
+/**
+ * Light every trail cell. Shader still gates paint by bust alpha, so letterbox
+ * stays clean while the full silhouette pixelates.
+ */
+export function stampPixelateAll(trail: PixelateTrail, strength = 255): void {
+  const v = Math.max(0, Math.min(255, strength | 0));
+  trail.pixels.fill(v);
+}

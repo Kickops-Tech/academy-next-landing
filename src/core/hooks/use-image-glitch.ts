@@ -38,7 +38,7 @@ import { clientPointToMediaCanvasUv } from "@core/lib/image-glitch/image-uv";
 import {
   createPixelateTrail,
   decayPixelateTrail,
-  stampPixelateBlocksAt,
+  stampPixelateAll,
   type PixelateTrail,
 } from "@core/lib/image-glitch/pixelate-trail";
 import { uploadTrailMask } from "@core/lib/image-glitch/pixelate-trail-webgl";
@@ -270,13 +270,9 @@ export function useImageGlitch(
 
       if (!uv.inside) return;
 
-      stampPixelateBlocksAt(
-        trail,
-        uv.x,
-        uv.y,
-        pixelateStampStrength,
-        pixelateStampBlockSpan,
-      );
+      // Full-silhouette stamp: a small brush left ears/crown sharp. Shader
+      // still skips transparent letterbox via bust alpha.
+      stampPixelateAll(trail, pixelateStampStrength);
       trailDirtyRef.current = true;
       uploadTrailIfDirty();
 

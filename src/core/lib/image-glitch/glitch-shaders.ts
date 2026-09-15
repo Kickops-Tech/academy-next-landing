@@ -369,8 +369,10 @@ void main() {
     if (blockA < 0.08) {
       blockA = alpha;
     }
-    float trailW = mask * smoothstep(0.08, 0.28, alpha) * smoothstep(0.08, 0.28, blockA);
-    col = mix(col, blockCol, clamp(trailW, 0.0, 1.0));
+    if (blockA >= 0.08) {
+      // Mask alone drives coverage — opaque blocks over the silhouette.
+      col = mix(col, blockCol, mask);
+    }
   }
 
   fragColor = vec4(col * alpha, alpha);

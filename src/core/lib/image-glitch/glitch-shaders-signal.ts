@@ -275,23 +275,36 @@ vec4 renderBust(vec2 vUvCoord) {
 }
 
 vec4 sampleTrailBlockColor(vec2 vUvCoord) {
-  vec2 qVv = quantizeCanvasUv(vUvCoord);
-  vec2 quantUv = fitUV(qVv);
-  vec4 pix = fetchBust(quantUv);
+  ivec2 block = ivec2(floor(vUvCoord * uTrailSize));
+  block = clamp(block, ivec2(0), ivec2(uTrailSize) - 1);
+  vec2 blockOrigin = vec2(block) / uTrailSize;
+  vec2 blockSize = 1.0 / uTrailSize;
 
-  // Block center often sits in transparent padding while the stamp still
-  // covers opaque corners (ear/hair). Fall back to the fragment sample so
-  // those texels still pixelate.
-  if (pix.a < 0.08) {
-    pix = fetchBust(fitUV(vUvCoord));
-    if (pix.a < 0.08) {
+  // Pick the most opaque tap in the cell so empty centers don't blank ears.
+  vec4 best = vec4(0.0);
+  for (int i = 0; i < 5; i++) {
+    vec2 o =
+      i == 0 ? vec2(0.5, 0.5) :
+      i == 1 ? vec2(0.18, 0.18) :
+      i == 2 ? vec2(0.82, 0.18) :
+      i == 3 ? vec2(0.18, 0.82) :
+               vec2(0.82, 0.82);
+    vec4 s = fetchBust(fitUV(blockOrigin + o * blockSize));
+    if (s.a > best.a) {
+      best = s;
+    }
+  }
+
+  if (best.a < 0.08) {
+    best = fetchBust(fitUV(vUvCoord));
+    if (best.a < 0.08) {
       return vec4(0.0);
     }
   }
 
   // Hover brush stays grayscale — never pull Kickops chroma from renderBust.
-  float g = floor(luma(pix.rgb) * 5.0 + 0.5) / 5.0;
-  return vec4(vec3(g), pix.a);
+  float g = floor(luma(best.rgb) * 5.0 + 0.5) / 5.0;
+  return vec4(vec3(g), best.a);
 }
 
 void main() {
@@ -308,9 +321,10 @@ void main() {
   float mask = hoverPixelateMask(vUv);
   if (mask >= 0.02 && bustAlpha >= 0.08) {
     vec4 blockCol = sampleTrailBlockColor(vUv);
-    float trailW = mask * smoothstep(0.08, 0.28, bustAlpha) * blockCol.a;
-    col.rgb = mix(col.rgb, blockCol.rgb, clamp(trailW, 0.0, 1.0));
-    col.a = max(col.a, blockCol.a * trailW);
+    if (blockCol.a >= 0.08) {
+      // Mask alone drives coverage — opaque blocks, no sharp bust showing through.
+      col.rgb = mix(col.rgb, blockCol.rgb, mask);
+    }
   }
 
   // Premultiply for WebGL canvas compositing (iOS Safari).

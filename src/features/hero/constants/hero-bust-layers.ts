@@ -54,8 +54,8 @@ export const HERO_BUST_SIGNAL_GLITCH_CONFIG: GlitchGridConfig = {
 export const HERO_BUST_PIXELATE_BLOCK_PX = 40;
 
 /**
- * Odd span of pixel blocks lit under the pointer (5 = 5×5 blocks).
- * Covers ear/hair edges without the oversized 7×7 brush.
+ * Kept for API compatibility — hover now stamps the full silhouette;
+ * span is unused on the signal path.
  */
 export const HERO_BUST_PIXELATE_STAMP_BLOCK_SPAN = 5;
 
