@@ -51,12 +51,13 @@ export const HERO_BUST_SIGNAL_GLITCH_CONFIG: GlitchGridConfig = {
 };
 
 /** Screen-pixel block size for hover pixelate (one mask cell = one visual block). */
-export const HERO_BUST_PIXELATE_BLOCK_PX = 48;
+export const HERO_BUST_PIXELATE_BLOCK_PX = 40;
 
 /**
- * Odd span of pixel blocks lit under the pointer (3 = 3×3 blocks, all-or-nothing).
+ * Odd span of pixel blocks lit under the pointer (5 = 5×5 blocks).
+ * Covers ear/hair edges without the oversized 7×7 brush.
  */
-export const HERO_BUST_PIXELATE_STAMP_BLOCK_SPAN = 3;
+export const HERO_BUST_PIXELATE_STAMP_BLOCK_SPAN = 5;
 
 /** Per-frame fade for lit blocks (0–255 mask). Lower = longer dissolve. */
 export const HERO_BUST_PIXELATE_MASK_DECAY = 4;

@@ -229,7 +229,7 @@ function AcademyBrainGlitch({
             ref={canvasRef}
             aria-hidden
             className={cn(
-              "absolute inset-0 size-full select-none",
+              "absolute inset-0 size-full select-none bg-transparent",
               "transition-opacity duration-200",
               !isReady && "opacity-0",
             )}

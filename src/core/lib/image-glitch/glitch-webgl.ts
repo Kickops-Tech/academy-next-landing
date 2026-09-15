@@ -139,7 +139,9 @@ export function createGlitchRenderer(
   const variant = options.variant ?? "vaporwave";
   const gl = canvas.getContext("webgl2", {
     alpha: true,
-    premultipliedAlpha: false,
+    // Premultiplied output — required for correct transparent PNG compositing
+    // on iOS Safari (non-premultiplied + white RGB in a=0 texels → white bands).
+    premultipliedAlpha: true,
     antialias: false,
   });
   if (!gl) throw new Error("WebGL2 not supported");

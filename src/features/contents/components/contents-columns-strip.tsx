@@ -31,8 +31,9 @@ type StripFitState = {
 
 /**
  * Bottom column band for flow layouts below xl.
- * Crops the Figma frame to the shaft zone. When max-svh caps height, scales
- * on Y only from the bottom so the band always spans full useful width.
+ * Crops the Figma frame to the shaft zone. When max-svh caps height, applies
+ * uniform scale from the bottom (never scaleY — that flattened shafts on iOS)
+ * and widens the stage so the band still spans full useful width.
  */
 export function ContentsColumnsStrip({
   variant,
@@ -63,7 +64,7 @@ export function ContentsColumnsStrip({
       setFit({
         stripHeight: next.stripHeight,
         fitScale: next.fitScale,
-        // Full-frame height at this width; fitScaleY compresses into max-svh.
+        // Full-frame height at this width; uniform fitScale compresses into max-svh.
         stageHeight: next.naturalHeight * (frame.height / bandHeight),
       });
     }
@@ -83,6 +84,10 @@ export function ContentsColumnsStrip({
   }, [variant, frame.height, bandHeight]);
 
   const bandScale = CONTENTS_COLUMNS_BAND_SCALE[variant];
+  const needsFit = fit.fitScale > 0 && fit.fitScale < 1;
+  // Widen then scale uniformly so visual width stays 100% without squashing Y.
+  const stageWidthPercent = needsFit ? 100 / fit.fitScale : 100;
+  const stageLeftPercent = needsFit ? -(stageWidthPercent - 100) / 2 : 0;
 
   return (
     <div
@@ -96,12 +101,12 @@ export function ContentsColumnsStrip({
       }}
     >
       <div
-        className="absolute inset-x-0 bottom-0 origin-bottom"
+        className="absolute bottom-0 origin-bottom"
         style={{
+          left: `${stageLeftPercent}%`,
+          width: `${stageWidthPercent}%`,
           height: fit.stageHeight > 0 ? fit.stageHeight : undefined,
-          // Y-only: uniform scale left ~55px gutters at ~1130px (fitScale≈0.9).
-          transform:
-            fit.fitScale < 1 ? `scaleY(${fit.fitScale})` : undefined,
+          transform: needsFit ? `scale(${fit.fitScale})` : undefined,
         }}
       >
         <ContentsColumns

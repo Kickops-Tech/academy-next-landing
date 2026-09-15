@@ -121,7 +121,7 @@ export function HeroBustGlitch({
           aria-hidden={true}
           className={cn(
             "absolute inset-0 size-full",
-            "pointer-events-none select-none",
+            "pointer-events-none select-none bg-transparent",
             "transition-opacity duration-200",
             !isReady && "opacity-0",
           )}

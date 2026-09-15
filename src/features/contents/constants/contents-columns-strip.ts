@@ -65,8 +65,8 @@ export const CONTENTS_COLUMNS_STRIP_EDGE_MASK =
   "linear-gradient(to bottom, transparent 0%, black 12%, black 100%)";
 
 /**
- * Strip viewport height + Y fit scale so max-svh never forces a uniform
- * shrink (which left side gaps around ~1100–1280px).
+ * Strip viewport height + uniform fit scale so max-svh never flattens shafts
+ * (legacy scaleY crushed columns on short iOS viewports).
  */
 export function getContentsColumnStripFit(
   width: number,

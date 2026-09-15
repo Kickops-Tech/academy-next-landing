@@ -236,7 +236,13 @@ vec3 samplePixelatedLayers(vec2 vUvCoord) {
   vec2 qVv = quantizeCanvasUv(vUvCoord);
   vec2 quantUv = clampUv(fitUV(qVv));
 
-  vec3 base = texture(uTex0, quantUv).rgb;
+  vec4 baseSample = texture(uTex0, quantUv);
+  // Block center in transparent padding — use local fragment so edge stamps paint.
+  if (baseSample.a < 0.08) {
+    quantUv = clampUv(fitUV(vUvCoord));
+    baseSample = texture(uTex0, quantUv);
+  }
+  vec3 base = baseSample.rgb;
   float levels = 5.0;
 
   if (uProceduralPixelate == 1) {
@@ -359,10 +365,14 @@ void main() {
     float blockA = uProceduralPixelate == 1
       ? texture(uTex0, qUv).a
       : max(texture(uTex0, qUv).a, texture(uTex1, qUv).a);
+    // Center of the block may be empty while this fragment is opaque.
+    if (blockA < 0.08) {
+      blockA = alpha;
+    }
     float trailW = mask * smoothstep(0.08, 0.28, alpha) * smoothstep(0.08, 0.28, blockA);
     col = mix(col, blockCol, clamp(trailW, 0.0, 1.0));
   }
 
-  fragColor = vec4(col, alpha);
+  fragColor = vec4(col * alpha, alpha);
 }
 `;

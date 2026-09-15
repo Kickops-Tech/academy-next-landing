@@ -278,21 +278,20 @@ vec4 sampleTrailBlockColor(vec2 vUvCoord) {
   vec2 qVv = quantizeCanvasUv(vUvCoord);
   vec2 quantUv = fitUV(qVv);
   vec4 pix = fetchBust(quantUv);
-  // Empty / off-bust blocks: no trail paint (avoids squares behind titles).
+
+  // Block center often sits in transparent padding while the stamp still
+  // covers opaque corners (ear/hair). Fall back to the fragment sample so
+  // those texels still pixelate.
   if (pix.a < 0.08) {
-    return vec4(0.0);
+    pix = fetchBust(fitUV(vUvCoord));
+    if (pix.a < 0.08) {
+      return vec4(0.0);
+    }
   }
 
-  vec3 pixRgb = floor(pix.rgb * 5.0 + 0.5) / 5.0;
-  if (uGlitchMix < 0.001) {
-    return vec4(pixRgb, pix.a);
-  }
-
-  // Mirror signal tint only from bust samples — keep alpha = bust coverage.
-  vec4 signalBlock = renderBust(qVv);
-  vec3 tinted = mix(toGray(pixRgb), signalBlock.rgb, 0.45 * signalBlock.a);
-  vec3 rgb = mix(pixRgb, tinted, 0.35 * uGlitchMix);
-  return vec4(rgb, pix.a);
+  // Hover brush stays grayscale — never pull Kickops chroma from renderBust.
+  float g = floor(luma(pix.rgb) * 5.0 + 0.5) / 5.0;
+  return vec4(vec3(g), pix.a);
 }
 
 void main() {
@@ -309,12 +308,12 @@ void main() {
   float mask = hoverPixelateMask(vUv);
   if (mask >= 0.02 && bustAlpha >= 0.08) {
     vec4 blockCol = sampleTrailBlockColor(vUv);
-    // Weight by local bust alpha so trail never fills transparent canvas.
     float trailW = mask * smoothstep(0.08, 0.28, bustAlpha) * blockCol.a;
     col.rgb = mix(col.rgb, blockCol.rgb, clamp(trailW, 0.0, 1.0));
     col.a = max(col.a, blockCol.a * trailW);
   }
 
-  fragColor = col;
+  // Premultiply for WebGL canvas compositing (iOS Safari).
+  fragColor = vec4(col.rgb * col.a, col.a);
 }
 `;
