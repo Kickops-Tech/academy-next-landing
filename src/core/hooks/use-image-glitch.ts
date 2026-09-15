@@ -30,8 +30,10 @@ import {
   uploadCellData,
   type DrawGlitchParams,
   type GlitchRenderer,
+  type GlitchShaderVariant,
   type ImageGlitchFit,
 } from "@core/lib/image-glitch/glitch-webgl";
+import type { GlitchSignalPresetId } from "@core/lib/image-glitch/glitch-signal-presets";
 import { clientPointToMediaCanvasUv } from "@core/lib/image-glitch/image-uv";
 import {
   createPixelateTrail,
@@ -52,6 +54,12 @@ export interface UseImageGlitchOptions {
    * hover pixelate (if enabled) runs.
    */
   enableEpisodicGlitch?: boolean;
+  /**
+   * Fragment program. Default `vaporwave` (legacy). Hero uses `signal`.
+   */
+  shaderVariant?: GlitchShaderVariant;
+  /** Intensity for `signal` variant only. */
+  signalPreset?: GlitchSignalPresetId;
   config?: GlitchGridConfig;
   pixelateBlockPx?: number;
   pixelateStampBlockSpan?: number;
@@ -73,7 +81,8 @@ export interface UseImageGlitchResult {
 }
 
 /**
- * Shared WebGL vaporwave glitch: textures, episodic bands, hover pixelate trail.
+ * Shared WebGL image glitch: textures, episodic bands, hover pixelate trail.
+ * Variants: vaporwave (legacy CRT) | signal (Kickops yellow/green).
  */
 export function useImageGlitch(
   options: UseImageGlitchOptions,
@@ -85,6 +94,8 @@ export function useImageGlitch(
     proceduralPixelate = false,
     enableHoverPixelate = true,
     enableEpisodicGlitch = true,
+    shaderVariant = "vaporwave",
+    signalPreset = "landing",
     config = DEFAULT_GLITCH_CONFIG,
     pixelateBlockPx = 48,
     pixelateStampBlockSpan = 3,
@@ -183,6 +194,8 @@ export function useImageGlitch(
         imageAspect,
         fit,
         proceduralPixelate,
+        signalPreset:
+          shaderVariant === "signal" ? signalPreset : undefined,
       };
     };
 
@@ -510,7 +523,7 @@ export function useImageGlitch(
       resizeGlitchCanvas(canvas, cssWidth, cssHeight);
 
       rendererRef.current?.destroy();
-      const renderer = createGlitchRenderer(canvas);
+      const renderer = createGlitchRenderer(canvas, { variant: shaderVariant });
       rendererRef.current = renderer;
       trailDirtyRef.current = true;
 
@@ -660,6 +673,8 @@ export function useImageGlitch(
     proceduralPixelate,
     enableHoverPixelate,
     enableEpisodicGlitch,
+    shaderVariant,
+    signalPreset,
     config,
     pixelateBlockPx,
     pixelateStampBlockSpan,

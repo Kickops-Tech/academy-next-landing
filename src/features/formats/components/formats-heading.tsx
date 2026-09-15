@@ -28,7 +28,7 @@ export function FormatsHeading({ variant }: FormatsHeadingProps) {
 
   if (variant === "mobile") {
     return (
-      <h2 className="relative z-30 flex items-center justify-center whitespace-nowrap px-4 pt-10 pb-6">
+      <h2 className="relative z-30 flex items-center justify-center whitespace-nowrap px-4 pt-10 pb-0">
         <span
           className={cn(
             "relative z-10 font-abril-fatface leading-none text-kickops-yellow",

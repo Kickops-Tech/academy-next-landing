@@ -22,9 +22,12 @@ export const FORMATS_DESKTOP_BLOCK_LEFT = {
   investimento: 955,
 } as const;
 
-/** Vertical positions in desktop frame (timeline above cards). */
+/**
+ * Vertical positions in desktop frame (Figma 918:286).
+ * Notice bar `918:351` @ 335; blocks resume below it.
+ */
 export const FORMATS_DESKTOP_TOP = {
-  timeline: 335,
+  notice: 335,
   blocks: 500,
   cta: 780,
 } as const;

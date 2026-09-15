@@ -1,6 +1,7 @@
 import {
   WIREFRAME_GLOBE_CAMERA_FOV,
   WIREFRAME_GLOBE_CAMERA_Z,
+  WIREFRAME_GLOBE_INTERIOR_SCALE,
   WIREFRAME_GLOBE_LINE_WIDTH_PX,
   WIREFRAME_GLOBE_RADIUS,
   WIREFRAME_GLOBE_ROTATION_RAD_S,
@@ -10,7 +11,6 @@ import {
   WIREFRAME_GLOBE_WAVE_FREQ,
   WIREFRAME_GLOBE_WAVE_SHARPNESS,
   WIREFRAME_GLOBE_WAVE_SPEED,
-  WIREFRAME_GLOBE_WIDTH_RATIO,
 } from "@core/constants/wireframe-globe";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
@@ -88,13 +88,12 @@ function createLatLongPositions(radius: number, segments: number): Float32Array 
   return new Float32Array(positions);
 }
 
-function widthFitScale(aspect: number) {
-  const fovRad = (WIREFRAME_GLOBE_CAMERA_FOV * Math.PI) / 180;
-  const visibleHeight =
-    2 * Math.tan(fovRad / 2) * WIREFRAME_GLOBE_CAMERA_Z;
-  const visibleWidth = visibleHeight * aspect;
-  const targetDiameter = visibleWidth * WIREFRAME_GLOBE_WIDTH_RATIO;
-  return targetDiameter / (2 * WIREFRAME_GLOBE_RADIUS);
+/**
+ * Fixed interior scale — camera stays inside the sphere on all viewports.
+ * (Former width-fit placed the camera outside a ~0.7× viewport globe.)
+ */
+function interiorScale() {
+  return WIREFRAME_GLOBE_INTERIOR_SCALE;
 }
 
 function createWaveUniformState(): WaveUniforms {
@@ -174,15 +173,16 @@ export function createWireframeGlobe(
   const camera = new PerspectiveCamera(
     WIREFRAME_GLOBE_CAMERA_FOV,
     1,
-    0.1,
+    0.02,
     20,
   );
+  // Slightly off-center so rotation reads as being inside the mesh.
   camera.position.z = WIREFRAME_GLOBE_CAMERA_Z;
 
   const renderer = new WebGLRenderer({
     canvas,
     alpha: true,
-    antialias: true,
+    antialias: false,
     powerPreference: "low-power",
   });
   renderer.setClearColor(0x000000, 0);
@@ -237,7 +237,7 @@ export function createWireframeGlobe(
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       material.resolution.set(width, height);
-      lines.scale.setScalar(widthFitScale(camera.aspect));
+      lines.scale.setScalar(interiorScale());
     },
 
     setLineColor(hex, opacity) {

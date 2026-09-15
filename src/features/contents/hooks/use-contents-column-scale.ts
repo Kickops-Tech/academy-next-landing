@@ -3,6 +3,7 @@
 import {
   CONTENTS_COLUMNS_SCALE,
   getContentsColumnScale,
+  getContentsFoldCompress,
   type ContentsLayoutVariant,
 } from "@features/contents/constants/contents-layout";
 import { useLayoutEffect, useState, type RefObject } from "react";
@@ -10,6 +11,7 @@ import { useLayoutEffect, useState, type RefObject } from "react";
 /**
  * Desktop composition scale from stage vs viewport height.
  * Short windows shrink toward {@link CONTENTS_COLUMNS_SCALE_MIN}.
+ * Tall folds (min-h-fold > aspect) grow shafts via fold compress.
  */
 export function useContentsColumnScale(
   containerRef: RefObject<HTMLElement | null>,
@@ -26,9 +28,21 @@ export function useContentsColumnScale(
     }
 
     function update() {
+      const stageWidth = node.clientWidth;
       const stageHeight = node.clientHeight;
       const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
-      setScale(getContentsColumnScale(stageHeight, viewportHeight, variant));
+      const foldCompress =
+        variant === "desktop"
+          ? getContentsFoldCompress(stageWidth, stageHeight)
+          : 1;
+      setScale(
+        getContentsColumnScale(
+          stageHeight,
+          viewportHeight,
+          variant,
+          foldCompress,
+        ),
+      );
     }
 
     update();

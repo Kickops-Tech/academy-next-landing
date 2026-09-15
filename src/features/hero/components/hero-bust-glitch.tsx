@@ -4,7 +4,9 @@ import { cn } from "@shadcn/lib/utils";
 import {
   HERO_BUST_DEFAULT_LAYER,
 } from "@features/hero/constants/hero-bust-layers";
+import { HERO_INTRO_BUST_FADE_MS } from "@features/hero/constants/hero-intro";
 import { useHeroBustGlitch } from "@features/hero/hooks/use-hero-bust-glitch";
+import { useEffect, useRef, useState } from "react";
 
 /** Figma bust frame (614×1030) — reserves aspect before the PNG loads. */
 const HERO_BUST_WIDTH = 614;
@@ -21,25 +23,58 @@ export interface HeroBustGlitchProps {
    * @default true — enabled for hypothesis validation; pass `false` to disable.
    */
   enableHoverPixelate?: boolean;
+  /** Fires once after the intro fade-in completes (or immediately if reduced motion). */
+  onIntroReady?: () => void;
 }
 
 /**
- * WebGL canvas that renders the layered Hero bust with vaporwave glitch effects.
- *
- * - `bust-1` is the default base outside sparse horizontal glitch bands.
- * - Ephemeral bands apply slice displacement, chromatic aberration, smear or
- *   color-layer accents (bust-2/3/4).
- * - Falls back to a static `bust-1` image if WebGL fails or while loading.
- *
- * Decorative only (`aria-hidden`); respects `prefers-reduced-motion`.
+ * WebGL canvas that renders the layered Hero bust with glitch effects.
+ * Starts invisible and fades in when textures (or static fallback) are ready.
  */
 export function HeroBustGlitch({
   className,
   enableHoverPixelate = true,
+  onIntroReady,
 }: HeroBustGlitchProps) {
   const { canvasRef, containerRef, isReady, useFallback } = useHeroBustGlitch({
     enableHoverPixelate,
   });
+  const [visible, setVisible] = useState(false);
+  const [fallbackImageReady, setFallbackImageReady] = useState(false);
+  const introNotifiedRef = useRef(false);
+  const onIntroReadyRef = useRef(onIntroReady);
+  onIntroReadyRef.current = onIntroReady;
+
+  const assetReady = useFallback ? fallbackImageReady : isReady;
+
+  useEffect(() => {
+    if (!assetReady) {
+      return;
+    }
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reduced.matches) {
+      setVisible(true);
+      if (!introNotifiedRef.current) {
+        introNotifiedRef.current = true;
+        onIntroReadyRef.current?.();
+      }
+      return;
+    }
+
+    const show = requestAnimationFrame(() => setVisible(true));
+    const done = window.setTimeout(() => {
+      if (!introNotifiedRef.current) {
+        introNotifiedRef.current = true;
+        onIntroReadyRef.current?.();
+      }
+    }, HERO_INTRO_BUST_FADE_MS);
+
+    return () => {
+      cancelAnimationFrame(show);
+      window.clearTimeout(done);
+    };
+  }, [assetReady]);
 
   return (
     <div
@@ -48,8 +83,11 @@ export function HeroBustGlitch({
         "relative overflow-hidden",
         "aspect-614/1030",
         enableHoverPixelate && "cursor-crosshair",
+        "transition-opacity ease-out motion-reduce:transition-none",
+        visible ? "opacity-100" : "opacity-0",
         className,
       )}
+      style={{ transitionDuration: `${HERO_INTRO_BUST_FADE_MS}ms` }}
     >
       <img
         src={HERO_BUST_DEFAULT_LAYER}
@@ -57,6 +95,7 @@ export function HeroBustGlitch({
         width={HERO_BUST_WIDTH}
         height={HERO_BUST_HEIGHT}
         aria-hidden={true}
+        onLoad={() => setFallbackImageReady(true)}
         className={cn(
           "absolute inset-0 size-full object-contain object-center",
           "pointer-events-none select-none",

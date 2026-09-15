@@ -1,4 +1,3 @@
-import { cn } from "@shadcn/lib/utils";
 import { HeroBustGlitch } from "@features/hero/components/hero-bust-glitch";
 
 /**
@@ -10,14 +9,21 @@ export interface HeroBustProps {
    * Hero stage so the bust can fill the full viewport on desktop.
    */
   className?: string;
+  /** Fires after the intro fade-in completes. */
+  onIntroReady?: () => void;
 }
 
 /**
  * Layered classical bust for the Landing Hero.
  *
- * Delegates to {@link HeroBustGlitch}: vaporwave / CRT glitch on the bust
- * (horizontal slices, chromatic aberration, scanlines) using all four assets.
+ * Delegates to {@link HeroBustGlitch}: glitch on the bust using the shared pipeline.
  */
-export function HeroBust({ className }: HeroBustProps) {
-  return <HeroBustGlitch className={className} enableHoverPixelate={true} />;
+export function HeroBust({ className, onIntroReady }: HeroBustProps) {
+  return (
+    <HeroBustGlitch
+      className={className}
+      enableHoverPixelate={true}
+      onIntroReady={onIntroReady}
+    />
+  );
 }

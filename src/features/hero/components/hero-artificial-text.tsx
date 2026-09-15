@@ -14,6 +14,13 @@ export interface HeroArtificialTextProps {
   delay?: number;
   /** Milliseconds to decode into the final text. */
   duration?: number;
+  /**
+   * When false, keeps the line blank and does not run baffle (hero intro gate).
+   * @default true
+   */
+  enabled?: boolean;
+  /** Fires once when the baffle reveal finishes (or immediately if reduced motion). */
+  onRevealComplete?: () => void;
 }
 
 const TEXT = "Artificial";
@@ -21,7 +28,7 @@ const BAFFLE_CHARACTERS =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789▓░█▒•/";
 
 /**
- * “Artificial” headline: baffle decode on mount, then sporadic font glitches.
+ * “Artificial” headline: baffle decode when enabled, then sporadic font glitches.
  *
  * Layout is locked to the default (League Gothic) metrics via an invisible sizer;
  * glitch glyphs may bleed outside that box without shifting surrounding copy.
@@ -30,11 +37,15 @@ export function HeroArtificialText({
   className,
   delay = 420,
   duration = 1500,
+  enabled = true,
+  onRevealComplete,
 }: HeroArtificialTextProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const [baffleComplete, setBaffleComplete] = useState(false);
+  const onRevealCompleteRef = useRef(onRevealComplete);
+  onRevealCompleteRef.current = onRevealComplete;
   const { fontClass, style: glitchStyle, isGlitching } = useSporadicFontGlitch({
-    enabled: baffleComplete,
+    enabled: enabled && baffleComplete,
     defaultFont: HERO_ARTIFICIAL_FONT,
     startAfterMs: 400,
     minIntervalMs: 4_200,
@@ -50,9 +61,16 @@ export function HeroArtificialText({
 
     setBaffleComplete(false);
 
+    if (!enabled) {
+      element.textContent = "";
+      return;
+    }
+
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reducedMotion.matches) {
       element.textContent = TEXT;
+      setBaffleComplete(true);
+      onRevealCompleteRef.current?.();
       return;
     }
 
@@ -74,7 +92,9 @@ export function HeroArtificialText({
         .reveal(duration, delay);
 
       completeTimer = setTimeout(() => {
-        if (!cancelled) setBaffleComplete(true);
+        if (cancelled) return;
+        setBaffleComplete(true);
+        onRevealCompleteRef.current?.();
       }, delay + duration);
     });
 
@@ -83,7 +103,7 @@ export function HeroArtificialText({
       instance?.stop();
       if (completeTimer) clearTimeout(completeTimer);
     };
-  }, [delay, duration]);
+  }, [delay, duration, enabled]);
 
   return (
     <span
@@ -91,11 +111,8 @@ export function HeroArtificialText({
         "relative isolate inline-block overflow-visible align-bottom",
         className,
       )}
+      aria-hidden={enabled ? undefined : true}
     >
-      {/*
-        Invisible sizer: holds the original League Gothic box so font cycles never
-        change width/height in the flex layout.
-      */}
       <span
         aria-hidden={true}
         className={cn(
@@ -114,9 +131,10 @@ export function HeroArtificialText({
           isGlitching && "z-10",
           fontClass,
           fontClass === "font-mrs-saint-delafield" && "normal-case",
+          !enabled && "opacity-0",
         )}
       >
-        {TEXT}
+        {enabled ? TEXT : null}
       </span>
     </span>
   );

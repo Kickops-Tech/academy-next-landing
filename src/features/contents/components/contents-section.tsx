@@ -1,5 +1,6 @@
 import { ContentsColumns } from "@features/contents/components/contents-columns";
 import { ContentsColumnsStrip } from "@features/contents/components/contents-columns-strip";
+import { ContentsDesktopStage } from "@features/contents/components/contents-desktop-stage";
 import { ContentsHeading } from "@features/contents/components/contents-heading";
 import { ContentsTopicCard } from "@features/contents/components/contents-topic";
 import { ContentsTopicsCarousel } from "@features/contents/components/contents-topics-carousel";
@@ -24,7 +25,7 @@ export function ContentsSection({
         not here — columns need edge-to-edge.
       */}
       <div className="relative hidden w-full xl:block">
-        <div className="@container relative aspect-[1512/982] min-h-fold w-full overflow-clip">
+        <ContentsDesktopStage>
           <ContentsColumns
             variant="desktop"
             parallax={parallax}
@@ -40,7 +41,7 @@ export function ContentsSection({
               pulseDelayMs={index * 280}
             />
           ))}
-        </div>
+        </ContentsDesktopStage>
       </div>
 
       {/*

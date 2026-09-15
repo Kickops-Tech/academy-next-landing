@@ -14,13 +14,18 @@ export interface HeroBaffleTextProps {
   delay?: number;
   /** Milliseconds to decode into the final text. */
   duration?: number;
+  /**
+   * When false, keeps the line blank and does not run baffle (hero intro gate).
+   * @default true
+   */
+  enabled?: boolean;
 }
 
 const BAFFLE_CHARACTERS =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789▓░█▒•/";
 
 /**
- * Hero headline line with a one-shot baffle.js decode on mount.
+ * Hero headline line with a one-shot baffle.js decode when {@link enabled}.
  *
  * Respects `prefers-reduced-motion` (shows final text immediately).
  */
@@ -29,12 +34,18 @@ export function HeroBaffleText({
   className,
   delay = 0,
   duration = 2400,
+  enabled = true,
 }: HeroBaffleTextProps) {
   const ref = useRef<HTMLSpanElement>(null);
 
   useLayoutEffect(() => {
     const element = ref.current;
     if (!element) return;
+
+    if (!enabled) {
+      element.textContent = "";
+      return;
+    }
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reducedMotion.matches) {
@@ -63,11 +74,15 @@ export function HeroBaffleText({
       cancelled = true;
       instance?.stop();
     };
-  }, [text, delay, duration]);
+  }, [text, delay, duration, enabled]);
 
   return (
-    <span ref={ref} className={cn(className)}>
-      {text}
+    <span
+      ref={ref}
+      className={cn(className)}
+      aria-hidden={enabled ? undefined : true}
+    >
+      {enabled ? text : null}
     </span>
   );
 }

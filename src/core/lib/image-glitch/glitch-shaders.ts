@@ -331,7 +331,7 @@ vec3 renderBust(vec2 vUvCoord) {
   return mix(clean, col, uGlitchMix);
 }
 
-// Trail: chunky pixel blocks; blend glitched burst into blocks when active.
+// Trail: chunky pixel blocks from bust only; never inflate alpha off-silhouette.
 vec3 sampleTrailBlockColor(vec2 vUvCoord) {
   vec2 qVv = quantizeCanvasUv(vUvCoord);
   vec3 pix = samplePixelatedLayers(qVv);
@@ -353,14 +353,14 @@ void main() {
   vec3 col = renderBust(vUv);
 
   float mask = hoverPixelateMask(vUv);
-  if (mask >= 0.02) {
+  if (mask >= 0.02 && alpha >= 0.08) {
     vec3 blockCol = sampleTrailBlockColor(vUv);
-    col = mix(col, blockCol, clamp(mask, 0.0, 1.0));
     vec2 qUv = clampUv(fitUV(quantizeCanvasUv(vUv)));
-    float accentA = uProceduralPixelate == 1
+    float blockA = uProceduralPixelate == 1
       ? texture(uTex0, qUv).a
-      : texture(uTex1, qUv).a;
-    alpha = max(alpha, accentA * mask);
+      : max(texture(uTex0, qUv).a, texture(uTex1, qUv).a);
+    float trailW = mask * smoothstep(0.08, 0.28, alpha) * smoothstep(0.08, 0.28, blockA);
+    col = mix(col, blockCol, clamp(trailW, 0.0, 1.0));
   }
 
   fragColor = vec4(col, alpha);

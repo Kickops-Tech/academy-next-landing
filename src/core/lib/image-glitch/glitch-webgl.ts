@@ -8,9 +8,18 @@ import {
   GLITCH_FRAGMENT_SHADER,
   GLITCH_VERTEX_SHADER,
 } from "@core/lib/image-glitch/glitch-shaders";
+import { GLITCH_SIGNAL_FRAGMENT_SHADER } from "@core/lib/image-glitch/glitch-shaders-signal";
+import {
+  GLITCH_SIGNAL_PRESETS,
+  type GlitchSignalPreset,
+  type GlitchSignalPresetId,
+} from "@core/lib/image-glitch/glitch-signal-presets";
 import { createTrailTexture } from "@core/lib/image-glitch/pixelate-trail-webgl";
 
 export type ImageGlitchFit = "contain" | "cover";
+
+/** Which fragment program to compile. Legacy vaporwave vs Kickops signal. */
+export type GlitchShaderVariant = "vaporwave" | "signal";
 
 /**
  * Runtime WebGL state for one glitch canvas instance.
@@ -22,6 +31,7 @@ export interface GlitchRenderer {
   cellTexture: WebGLTexture;
   trailTexture: WebGLTexture;
   layerTextures: WebGLTexture[];
+  variant: GlitchShaderVariant;
   uniforms: {
     resolution: WebGLUniformLocation | null;
     gridSize: WebGLUniformLocation | null;
@@ -34,9 +44,17 @@ export interface GlitchRenderer {
     trailMask: WebGLUniformLocation | null;
     cellData: WebGLUniformLocation | null;
     textures: (WebGLUniformLocation | null)[];
+    shiftAmp: WebGLUniformLocation | null;
+    chromaAmp: WebGLUniformLocation | null;
+    invertChance: WebGLUniformLocation | null;
+    stripActiveThreshold: WebGLUniformLocation | null;
   };
   destroy: () => void;
 }
+
+export type CreateGlitchRendererOptions = {
+  variant?: GlitchShaderVariant;
+};
 
 function compileShader(
   gl: WebGL2RenderingContext,
@@ -55,9 +73,16 @@ function compileShader(
   return shader;
 }
 
-function createProgram(gl: WebGL2RenderingContext): WebGLProgram {
+function createProgram(
+  gl: WebGL2RenderingContext,
+  variant: GlitchShaderVariant,
+): WebGLProgram {
   const vs = compileShader(gl, gl.VERTEX_SHADER, GLITCH_VERTEX_SHADER);
-  const fs = compileShader(gl, gl.FRAGMENT_SHADER, GLITCH_FRAGMENT_SHADER);
+  const fragmentSource =
+    variant === "signal"
+      ? GLITCH_SIGNAL_FRAGMENT_SHADER
+      : GLITCH_FRAGMENT_SHADER;
+  const fs = compileShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
   const program = gl.createProgram();
   if (!program) throw new Error("Failed to create program");
   gl.attachShader(program, vs);
@@ -107,7 +132,11 @@ function createEmptyTexture(gl: WebGL2RenderingContext): WebGLTexture {
 /**
  * Initialize WebGL2 on a canvas element.
  */
-export function createGlitchRenderer(canvas: HTMLCanvasElement): GlitchRenderer {
+export function createGlitchRenderer(
+  canvas: HTMLCanvasElement,
+  options: CreateGlitchRendererOptions = {},
+): GlitchRenderer {
+  const variant = options.variant ?? "vaporwave";
   const gl = canvas.getContext("webgl2", {
     alpha: true,
     premultipliedAlpha: false,
@@ -115,7 +144,7 @@ export function createGlitchRenderer(canvas: HTMLCanvasElement): GlitchRenderer 
   });
   if (!gl) throw new Error("WebGL2 not supported");
 
-  const program = createProgram(gl);
+  const program = createProgram(gl, variant);
   const vao = createQuadVao(gl, program);
   const cellTexture = createEmptyTexture(gl);
   const trailTexture = createTrailTexture(gl);
@@ -135,6 +164,13 @@ export function createGlitchRenderer(canvas: HTMLCanvasElement): GlitchRenderer 
     textures: [0, 1, 2, 3].map((i) =>
       gl.getUniformLocation(program, `uTex${i}`),
     ),
+    shiftAmp: gl.getUniformLocation(program, "uShiftAmp"),
+    chromaAmp: gl.getUniformLocation(program, "uChromaAmp"),
+    invertChance: gl.getUniformLocation(program, "uInvertChance"),
+    stripActiveThreshold: gl.getUniformLocation(
+      program,
+      "uStripActiveThreshold",
+    ),
   };
 
   gl.useProgram(program);
@@ -146,6 +182,14 @@ export function createGlitchRenderer(canvas: HTMLCanvasElement): GlitchRenderer 
   gl.uniform1f(uniforms.imageAspect, 1);
   gl.uniform1i(uniforms.fitMode, 0);
   gl.uniform1i(uniforms.proceduralPixelate, 0);
+
+  if (variant === "signal") {
+    const preset = GLITCH_SIGNAL_PRESETS.landing;
+    gl.uniform1f(uniforms.shiftAmp, preset.shiftAmp);
+    gl.uniform1f(uniforms.chromaAmp, preset.chromaAmp);
+    gl.uniform1f(uniforms.invertChance, preset.invertChance);
+    gl.uniform1f(uniforms.stripActiveThreshold, preset.stripActiveThreshold);
+  }
 
   const destroy = () => {
     gl.deleteProgram(program);
@@ -162,6 +206,7 @@ export function createGlitchRenderer(canvas: HTMLCanvasElement): GlitchRenderer 
     cellTexture,
     trailTexture,
     layerTextures,
+    variant,
     uniforms,
     destroy,
   };
@@ -290,6 +335,20 @@ export interface DrawGlitchParams {
   imageAspect: number;
   fit: ImageGlitchFit;
   proceduralPixelate: boolean;
+  /** Signal preset floats; ignored for vaporwave. */
+  signalPreset?: GlitchSignalPreset | GlitchSignalPresetId;
+}
+
+function resolveSignalPreset(
+  preset?: GlitchSignalPreset | GlitchSignalPresetId,
+): GlitchSignalPreset {
+  if (!preset) {
+    return GLITCH_SIGNAL_PRESETS.landing;
+  }
+  if (typeof preset === "string") {
+    return GLITCH_SIGNAL_PRESETS[preset];
+  }
+  return preset;
 }
 
 /**
@@ -300,7 +359,8 @@ export function drawGlitchFrame(
   canvas: HTMLCanvasElement,
   params: DrawGlitchParams,
 ): void {
-  const { gl, program, vao, cellTexture, layerTextures, uniforms } = renderer;
+  const { gl, program, vao, cellTexture, layerTextures, uniforms, variant } =
+    renderer;
 
   if (gl.isContextLost()) return;
 
@@ -332,6 +392,14 @@ export function drawGlitchFrame(
   gl.uniform1f(uniforms.time, params.time);
   gl.uniform1f(uniforms.glitchMix, params.glitchMix);
   gl.uniform2f(uniforms.trailSize, params.trailCols, params.trailRows);
+
+  if (variant === "signal") {
+    const preset = resolveSignalPreset(params.signalPreset);
+    gl.uniform1f(uniforms.shiftAmp, preset.shiftAmp);
+    gl.uniform1f(uniforms.chromaAmp, preset.chromaAmp);
+    gl.uniform1f(uniforms.invertChance, preset.invertChance);
+    gl.uniform1f(uniforms.stripActiveThreshold, preset.stripActiveThreshold);
+  }
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   gl.bindVertexArray(null);

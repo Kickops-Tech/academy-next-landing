@@ -1,13 +1,20 @@
 "use client";
 
-import { cn } from "@shadcn/lib/utils";
 import { Button } from "@shadcn/ui/button";
 import { HeroArtificialText } from "@features/hero/components/hero-artificial-text";
 import { HeroBaffleText } from "@features/hero/components/hero-baffle-text";
 import { HeroBust } from "@features/hero/components/hero-bust";
+import {
+  HERO_INTRO_COPY_AFTER_TITLE_MS,
+  HERO_INTRO_COPY_DURATION_MS,
+  HERO_INTRO_TITLE_BAFFLE,
+  HERO_INTRO_TITLE_GAP_MS,
+} from "@features/hero/constants/hero-intro";
 import { HERO_SCROLL_CSS } from "@features/hero/constants/hero-scroll-parallax";
 import { useHeroScrollParallax } from "@features/hero/hooks/use-hero-scroll-parallax";
-import { useRef, type CSSProperties } from "react";
+import { cn } from "@shadcn/lib/utils";
+import { ArrowRight } from "lucide-react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 
 /**
  * Supporting copy under the Hero title (Figma Home D / Home M).
@@ -42,19 +49,48 @@ const TITLE_LAYER_STYLE = layerStyle(
   HERO_SCROLL_CSS.titleY,
   HERO_SCROLL_CSS.titleOpacity,
 );
-const COPY_LAYER_STYLE = layerStyle(
-  HERO_SCROLL_CSS.copyY,
-  HERO_SCROLL_CSS.copyOpacity,
-);
 
 /**
  * Hero section with scroll parallax: bust moves up faster and fades slower;
  * titles and copy fade out sooner with lighter vertical travel.
- * Parallax is driven by CSS vars on the section (no React re-renders on scroll).
+ *
+ * Intro: bust fade-in → title baffle → copy/CTA fade-in slide-up.
  */
 export function HeroParallaxSection() {
   const sectionRef = useRef<HTMLElement>(null);
   useHeroScrollParallax(sectionRef);
+
+  const [titleActive, setTitleActive] = useState(false);
+  const [copyActive, setCopyActive] = useState(false);
+
+  const onBustIntroReady = useCallback(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reduced.matches) {
+      setTitleActive(true);
+      setCopyActive(true);
+      return;
+    }
+
+    window.setTimeout(() => setTitleActive(true), HERO_INTRO_TITLE_GAP_MS);
+  }, []);
+
+  useEffect(() => {
+    if (!titleActive || copyActive) {
+      return;
+    }
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reduced.matches) {
+      setCopyActive(true);
+      return;
+    }
+
+    const timer = window.setTimeout(
+      () => setCopyActive(true),
+      HERO_INTRO_COPY_AFTER_TITLE_MS,
+    );
+    return () => window.clearTimeout(timer);
+  }, [titleActive, copyActive]);
 
   return (
     <section
@@ -78,12 +114,13 @@ export function HeroParallaxSection() {
         <div
           className={cn(
             "flex h-full w-full justify-center",
-            // Mobile: sit the bust on the title stack (less empty crown).
-            "items-end pb-[22%] md:items-center md:pb-0",
+            // Mobile: lift bust so eyes/nose clear the title stack.
+            "items-end pb-[36%] md:items-center md:pb-0",
           )}
           style={BUST_LAYER_STYLE}
         >
           <HeroBust
+            onIntroReady={onBustIntroReady}
             className={cn(
               "select-none",
               /*
@@ -94,6 +131,14 @@ export function HeroParallaxSection() {
               "md:h-[min(110svh,64.375rem)] md:max-w-none",
               "2xl:h-[min(108svh,72rem)]",
               "3xl:h-[min(105svh,80rem)]",
+              /*
+                Lift bust so eyes/nose clear “Introspecção”; title still cuts
+                mouth/beard. Offset on the bust node — parent keeps parallax.
+              */
+              "-translate-y-[min(8vh,3rem)]",
+              "md:-translate-y-[min(12vh,6rem)]",
+              "xl:-translate-y-[min(14vh,7rem)]",
+              "3xl:-translate-y-[min(12vh,6.5rem)]",
             )}
           />
         </div>
@@ -120,21 +165,25 @@ export function HeroParallaxSection() {
           "max-w-[94.5rem] 3xl:max-w-[120rem]",
           // Mobile: light top pad — justify-end parks the CTA; keep titles readable.
           "px-3 pb-8 pt-4",
-          "md:px-8 md:pb-20 md:pt-[min(40svh,20rem)]",
-          "3xl:pb-24 3xl:pt-[min(36svh,22rem)]",
+          // md+: slightly more top pad so title sits lower on the lifted bust.
+          "md:px-8 md:pb-16 md:pt-[min(44svh,22rem)]",
+          "3xl:pb-20 3xl:pt-[min(40svh,24rem)]",
         )}
       >
         <h1
           className={cn(
             "flex w-full max-w-full flex-col items-center overflow-visible",
             "leading-none tracking-tight",
+            !titleActive && "invisible",
           )}
           style={TITLE_LAYER_STYLE}
+          aria-hidden={!titleActive}
         >
           <HeroBaffleText
             text={"Introspecção"}
-            delay={80}
-            duration={2400}
+            enabled={titleActive}
+            delay={HERO_INTRO_TITLE_BAFFLE.introspeccao.delay}
+            duration={HERO_INTRO_TITLE_BAFFLE.introspeccao.duration}
             className={cn(
               "font-abril-fatface",
               "bg-linear-to-b from-white to-[#f5f5f5] bg-clip-text text-transparent",
@@ -153,39 +202,89 @@ export function HeroParallaxSection() {
           >
             <HeroBaffleText
               text={"Inteligência"}
-              delay={280}
-              duration={3000}
+              enabled={titleActive}
+              delay={HERO_INTRO_TITLE_BAFFLE.inteligencia.delay}
+              duration={HERO_INTRO_TITLE_BAFFLE.inteligencia.duration}
               className={cn("block text-kickops-green")}
             />
             <HeroArtificialText
-              delay={420}
-              duration={3000}
+              enabled={titleActive}
+              delay={HERO_INTRO_TITLE_BAFFLE.artificial.delay}
+              duration={HERO_INTRO_TITLE_BAFFLE.artificial.duration}
               className={cn("text-kickops-yellow", "-mt-[0.14em] lg:mt-0")}
             />
           </span>
         </h1>
 
-        <div style={COPY_LAYER_STYLE}>
-          <p
+        {/*
+          Outer: scroll Y only. Opacity stays on the intro child so parallax
+          vars cannot hide copy before the baffle finishes.
+        */}
+        <div
+          style={{
+            transform: `translate3d(0, var(${HERO_SCROLL_CSS.copyY}, 0px), 0)`,
+            opacity: copyActive
+              ? `var(${HERO_SCROLL_CSS.copyOpacity}, 1)`
+              : 1,
+          }}
+        >
+          <div
+            style={{
+              opacity: copyActive ? 1 : 0,
+              transform: copyActive ? "translateY(0)" : "translateY(1.25rem)",
+              transition: `opacity ${HERO_INTRO_COPY_DURATION_MS}ms ease-out, transform ${HERO_INTRO_COPY_DURATION_MS}ms ease-out`,
+            }}
             className={cn(
-              "mt-5 max-w-[20.5625rem] text-sm leading-[1.4] text-white",
-              "md:mt-6 md:max-w-[40rem] md:text-base",
-              "3xl:mt-8 3xl:max-w-[48rem] 3xl:text-lg",
+              "motion-reduce:transition-none",
+              !copyActive && "pointer-events-none",
             )}
           >
-            {HERO_DESCRIPTION}
-          </p>
+            <p
+              className={cn(
+                "mt-5 max-w-[20.5625rem] text-sm leading-[1.4] text-white",
+                "md:mt-6 md:max-w-[40rem] md:text-base",
+                "3xl:mt-8 3xl:max-w-[48rem] 3xl:text-lg",
+              )}
+            >
+              {HERO_DESCRIPTION}
+            </p>
 
-          <Button
-            className={cn(
-              "mt-6 h-auto rounded-none border-0 md:mt-8 3xl:mt-10",
-              "bg-kickops-yellow px-10 py-6 3xl:px-12 3xl:py-7",
-              "text-base font-bold text-kickops-gray md:text-lg 3xl:text-xl",
-              "hover:bg-kickops-yellow/90",
-            )}
-          >
-            {HERO_CTA_LABEL}
-          </Button>
+            <Button
+              className={cn(
+                "group mt-5 h-auto rounded-none border-0 md:mt-6 3xl:mt-8",
+                "inline-flex items-center justify-center",
+                // Figma Buttom: Amarelo → Variant2 (white + arrow)
+                "bg-kickops-yellow px-10 py-4 3xl:px-12 3xl:py-5",
+                "text-base font-bold text-kickops-gray md:text-lg 3xl:text-xl",
+                "transition-colors duration-300 ease-out",
+                "hover:bg-white focus-visible:bg-white active:bg-white",
+              )}
+            >
+              {HERO_CTA_LABEL}
+              <span
+                aria-hidden
+                className={cn(
+                  "inline-flex h-6 shrink-0 overflow-hidden text-kickops-gray 3xl:h-7",
+                  "w-0 opacity-0",
+                  "transition-[width,opacity,margin] duration-300 ease-out",
+                  "group-hover:ml-2 group-hover:w-6 group-hover:opacity-100",
+                  "group-focus-visible:ml-2 group-focus-visible:w-6 group-focus-visible:opacity-100",
+                  "3xl:group-hover:w-7 3xl:group-focus-visible:w-7",
+                  "motion-reduce:transition-none",
+                )}
+              >
+                <ArrowRight
+                  className={cn(
+                    "size-6 shrink-0 3xl:size-7",
+                    "-translate-x-2 transition-transform duration-300 ease-out",
+                    "group-hover:translate-x-0 group-focus-visible:translate-x-0",
+                    "motion-reduce:translate-x-0",
+                  )}
+                  strokeWidth={2.25}
+                />
+              </span>
+            </Button>
+          </div>
         </div>
       </div>
     </section>

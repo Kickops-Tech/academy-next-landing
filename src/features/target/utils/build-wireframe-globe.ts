@@ -43,12 +43,24 @@ export function createSeededRandom(seed: string) {
   };
 }
 
+function shuffleInPlace<T>(items: T[], random: () => number): T[] {
+  for (let index = items.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(random() * (index + 1));
+    const current = items[index] as T;
+    items[index] = items[swapIndex] as T;
+    items[swapIndex] = current;
+  }
+
+  return items;
+}
+
 function buildDots(random: () => number): WireframeGlobeDot[] {
   const density =
     TARGET_GLOBE_DOT_DENSITY_MIN +
     random() * (TARGET_GLOBE_DOT_DENSITY_MAX - TARGET_GLOBE_DOT_DENSITY_MIN);
 
-  const shuffled = [...TARGET_GLOBE_INTERSECTIONS].sort(() => random() - 0.5);
+  // Fisher–Yates: fixed RNG call count — unlike Array.sort(random), which differs across engines.
+  const shuffled = shuffleInPlace([...TARGET_GLOBE_INTERSECTIONS], random);
   const count = Math.max(8, Math.round(shuffled.length * density));
 
   return shuffled.slice(0, count).map((candidate, sequenceIndex) => {

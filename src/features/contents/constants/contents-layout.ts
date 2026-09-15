@@ -78,10 +78,12 @@ export const CONTENTS_TOPIC_CARD = {
 } as const;
 
 export const CONTENTS_DESKTOP_LAYOUT = {
-  past: { left: 200, top: 335, width: 228, height: 268 },
-  inflection: { left: 483, top: 335, width: 228, height: 268 },
-  now: { left: 766, top: 335, width: 228, height: 268 },
-  future: { left: 1049, top: 335, width: 228, height: 268 },
+  // Topic tops opened vs Figma 335 — title→content air matches LP visual
+  // (fold-compress no longer pulls cards up into the heading).
+  past: { left: 200, top: 380, width: 228, height: 268 },
+  inflection: { left: 483, top: 380, width: 228, height: 268 },
+  now: { left: 766, top: 380, width: 228, height: 268 },
+  future: { left: 1049, top: 380, width: 228, height: 268 },
   glow1: { left: 237 - 120, top: 773 - 120, width: 548, height: 548 },
   glow2: { left: 654 - 120, top: 773 - 120, width: 548, height: 548 },
   glow3: { left: 1000 - 120, top: 825 - 120, width: 548, height: 548 },
@@ -187,7 +189,7 @@ export const CONTENTS_MOBILE_TOPIC_GAP =
  * {@link getContentsColumnScale}) so shafts stay visible without hard crops.
  */
 export const CONTENTS_COLUMNS_SCALE = {
-  desktop: 0.78,
+  desktop: 0.9,
   mobile: 0.88,
 } as const;
 
@@ -200,22 +202,46 @@ export const CONTENTS_COLUMNS_SCALE_MIN = {
 /**
  * Soft top fade — desktop reveals earlier with a longer band so short
  * viewports do not get a hard “diagonal” cut across rotated shafts.
+ * (Desktop xl stage keeps fadeTop off by default — Figma shows full crowns;
+ * stops kept for strip/experiments.)
  */
 export const CONTENTS_COLUMNS_MASK = {
   desktop:
-    "linear-gradient(to bottom, transparent 0%, transparent 34%, black 58%)",
+    "linear-gradient(to bottom, transparent 0%, transparent 30%, black 52%)",
   mobile:
     "linear-gradient(to bottom, transparent 0%, transparent 48%, black 58%)",
 } as const;
 
 /**
+ * When the xl stage is taller than the Figma aspect (min-h-fold wins),
+ * compress mid-fold vertical % so topic→column gap does not inflate.
+ * Sweet spot (stage ≈ aspect height) → 1.
+ */
+export function getContentsFoldCompress(
+  stageWidth: number,
+  stageHeight: number,
+) {
+  if (stageWidth <= 0 || stageHeight <= 0) {
+    return 1;
+  }
+
+  const aspectHeight =
+    stageWidth *
+    (CONTENTS_DESKTOP_FRAME.height / CONTENTS_DESKTOP_FRAME.width);
+
+  return Math.min(1, aspectHeight / stageHeight);
+}
+
+/**
  * Desktop: shrink with viewport/stage height so composition fits short windows.
+ * Tall folds (compress < 1): grow shafts toward the mid gap (origin-bottom).
  * Mobile: keep the constant base scale.
  */
 export function getContentsColumnScale(
   stageHeight: number,
   viewportHeight: number,
   variant: ContentsLayoutVariant,
+  foldCompress = 1,
 ) {
   const base = CONTENTS_COLUMNS_SCALE[variant];
   if (variant === "mobile") {
@@ -227,11 +253,18 @@ export function getContentsColumnScale(
   }
 
   const heightFit = Math.min(1, viewportHeight / stageHeight);
-  const scaled = base * heightFit;
-  return Math.min(
+  let scaled = base * heightFit;
+  scaled = Math.min(
     base,
     Math.max(CONTENTS_COLUMNS_SCALE_MIN.desktop, scaled),
   );
+
+  if (foldCompress < 1) {
+    // Fill inflated mid-gap without exceeding full Figma scale.
+    scaled = Math.min(1, scaled / foldCompress);
+  }
+
+  return scaled;
 }
 
 /**
@@ -309,6 +342,7 @@ export function getContentsTopicStyle(
   const box = figmaBoxStyle(CONTENTS_DESKTOP_LAYOUT[id], CONTENTS_DESKTOP_FRAME);
   return {
     left: box.left,
+    // Keep Figma title→topic air; fold-compress only grows columns below.
     top: box.top,
     width: box.width,
   };

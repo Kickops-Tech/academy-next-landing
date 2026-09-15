@@ -13,7 +13,7 @@ export const WIREFRAME_GLOBE_SEGMENTS = 48;
 export const WIREFRAME_GLOBE_ROTATION_RAD_S = 0.08;
 
 /** Screen-space line thickness (px) — fat lines via LineSegments2. */
-export const WIREFRAME_GLOBE_LINE_WIDTH_PX = 2.75;
+export const WIREFRAME_GLOBE_LINE_WIDTH_PX = 2.25;
 
 /** Cap devicePixelRatio — watermark does not need retina sharpness. */
 export const WIREFRAME_GLOBE_DPR_CAP_DESKTOP = 1.5;
@@ -23,18 +23,25 @@ export const WIREFRAME_GLOBE_DPR_CAP_MOBILE = 1;
 export const WIREFRAME_GLOBE_MOBILE_MAX_WIDTH = 768;
 
 /**
- * Base sphere radius in world units (scaled in `setSize` to
- * {@link WIREFRAME_GLOBE_WIDTH_RATIO} of the viewport width).
+ * Base sphere radius in world units. Scale keeps the camera inside
+ * (see {@link WIREFRAME_GLOBE_INTERIOR_SCALE}).
  */
 export const WIREFRAME_GLOBE_RADIUS = 1;
 
-export const WIREFRAME_GLOBE_CAMERA_Z = 2.55;
+/**
+ * Camera sits inside the sphere (experiment: immersive wireframe).
+ * Must stay below scaled radius (`RADIUS * INTERIOR_SCALE`).
+ */
+export const WIREFRAME_GLOBE_CAMERA_Z = 0.55;
 
-/** Vertical FOV for the globe camera (degrees). */
-export const WIREFRAME_GLOBE_CAMERA_FOV = 42;
+/** Vertical FOV for the globe camera (degrees). Wider when viewing from inside. */
+export const WIREFRAME_GLOBE_CAMERA_FOV = 85;
 
-/** Target on-screen diameter as a fraction of canvas width. */
-export const WIREFRAME_GLOBE_WIDTH_RATIO = 0.7;
+/**
+ * World scale applied in `setSize` — large enough that the camera is
+ * internal on mobile and desktop (no exterior silhouette).
+ */
+export const WIREFRAME_GLOBE_INTERIOR_SCALE = 2.4;
 
 /**
  * Soft follow speed for line color/opacity when crossing section themes.
@@ -64,7 +71,7 @@ export const WIREFRAME_GLOBE_THEME = {
   contents: {
     fillClassName: "bg-white",
     lineColor: "#121212",
-    lineOpacity: 0.015,
+    lineOpacity: 0.035,
   },
   formats: {
     fillClassName: "wireframe-globe-fill-formats",

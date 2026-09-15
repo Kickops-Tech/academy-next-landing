@@ -112,8 +112,8 @@ export function TargetAudienceSection() {
           "py-10 md:py-12",
         )}
       >
-        {/* Desktop Figma stage — only when width can hold absolute layout. */}
-        <div className="relative hidden w-full xl:block">
+        {/* Desktop Figma stage — lg+ (tablet grid blows up ~1100–1280). */}
+        <div className="relative hidden w-full lg:block">
           <div className="@container relative aspect-[1512/982] w-full">
             <TargetHeading variant="desktop" />
             {TARGET_AUDIENCES.map((audience) => (
@@ -131,7 +131,7 @@ export function TargetAudienceSection() {
         {/*
           Tablet: B1 full row, B2 | B3 — avoids scaled Figma stage crushing type.
         */}
-        <div className="relative hidden w-full md:block xl:hidden">
+        <div className="relative hidden w-full md:block lg:hidden">
           <div className="@container relative w-full px-4">
             <TargetHeading
               variant="mobile"
