@@ -51,11 +51,10 @@ export const HERO_BUST_SIGNAL_GLITCH_CONFIG: GlitchGridConfig = {
 };
 
 /** Screen-pixel block size for hover pixelate (one mask cell = one visual block). */
-export const HERO_BUST_PIXELATE_BLOCK_PX = 40;
+export const HERO_BUST_PIXELATE_BLOCK_PX = 32;
 
 /**
- * Kept for API compatibility — hover now stamps the full silhouette;
- * span is unused on the signal path.
+ * Odd span of pixel blocks lit under the pointer (5 = 5×5 blocks).
  */
 export const HERO_BUST_PIXELATE_STAMP_BLOCK_SPAN = 5;
 

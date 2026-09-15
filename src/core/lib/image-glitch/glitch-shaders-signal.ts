@@ -281,7 +281,8 @@ vec4 sampleTrailBlockColor(vec2 vUvCoord) {
   vec2 blockSize = 1.0 / uTrailSize;
 
   // Pick the most opaque tap in the cell so empty centers don't blank ears.
-  vec4 best = vec4(0.0);
+  vec2 bestCanvasUv = blockOrigin + vec2(0.5) * blockSize;
+  float bestA = 0.0;
   for (int i = 0; i < 5; i++) {
     vec2 o =
       i == 0 ? vec2(0.5, 0.5) :
@@ -289,22 +290,28 @@ vec4 sampleTrailBlockColor(vec2 vUvCoord) {
       i == 2 ? vec2(0.82, 0.18) :
       i == 3 ? vec2(0.18, 0.82) :
                vec2(0.82, 0.82);
-    vec4 s = fetchBust(fitUV(blockOrigin + o * blockSize));
-    if (s.a > best.a) {
-      best = s;
+    vec2 canvasUv = blockOrigin + o * blockSize;
+    float a = fetchBust(fitUV(canvasUv)).a;
+    if (a > bestA) {
+      bestA = a;
+      bestCanvasUv = canvasUv;
     }
   }
 
-  if (best.a < 0.08) {
-    best = fetchBust(fitUV(vUvCoord));
-    if (best.a < 0.08) {
+  if (bestA < 0.08) {
+    bestCanvasUv = vUvCoord;
+    bestA = fetchBust(fitUV(bestCanvasUv)).a;
+    if (bestA < 0.08) {
       return vec4(0.0);
     }
   }
 
-  // Hover brush stays grayscale — never pull Kickops chroma from renderBust.
-  float g = floor(luma(best.rgb) * 5.0 + 0.5) / 5.0;
-  return vec4(vec3(g), best.a);
+  // Block color from the live glitched bust under this cell (signal chroma
+  // included while uGlitchMix > 0), then posterized into chunky pixels.
+  vec4 glitched = renderBust(bestCanvasUv);
+  float levels = 5.0;
+  vec3 rgb = floor(glitched.rgb * levels + 0.5) / levels;
+  return vec4(rgb, max(bestA, glitched.a));
 }
 
 void main() {

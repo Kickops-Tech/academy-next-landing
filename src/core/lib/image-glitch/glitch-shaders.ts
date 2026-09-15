@@ -337,14 +337,16 @@ vec3 renderBust(vec2 vUvCoord) {
   return mix(clean, col, uGlitchMix);
 }
 
-// Trail: chunky pixel blocks from bust only; never inflate alpha off-silhouette.
+// Trail: chunky pixel blocks — pull live glitch color when mix is active.
 vec3 sampleTrailBlockColor(vec2 vUvCoord) {
   vec2 qVv = quantizeCanvasUv(vUvCoord);
   vec3 pix = samplePixelatedLayers(qVv);
   if (uGlitchMix < 0.001) return pix;
 
   vec3 glitchBlock = renderBust(qVv);
-  return mix(pix, glitchBlock, 0.38);
+  float levels = 5.0;
+  vec3 posterized = floor(glitchBlock * levels + 0.5) / levels;
+  return mix(pix, posterized, clamp(uGlitchMix * 0.85, 0.0, 1.0));
 }
 
 void main() {
