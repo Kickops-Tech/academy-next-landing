@@ -23,7 +23,13 @@ export interface HeroBustGlitchProps {
    * @default true — enabled for hypothesis validation; pass `false` to disable.
    */
   enableHoverPixelate?: boolean;
-  /** Fires once after the intro fade-in completes (or immediately if reduced motion). */
+  /**
+   * `fade` — opacity 0→1 then `onIntroReady` (legacy).
+   * `instant` — show immediately when assets ready (behind Lottie curtain).
+   * @default "fade"
+   */
+  introMode?: "fade" | "instant";
+  /** Fires once after the intro fade-in completes (or immediately if reduced motion / instant). */
   onIntroReady?: () => void;
 }
 
@@ -34,6 +40,7 @@ export interface HeroBustGlitchProps {
 export function HeroBustGlitch({
   className,
   enableHoverPixelate = true,
+  introMode = "fade",
   onIntroReady,
 }: HeroBustGlitchProps) {
   const { canvasRef, containerRef, isReady, useFallback } = useHeroBustGlitch({
@@ -52,29 +59,28 @@ export function HeroBustGlitch({
       return;
     }
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (reduced.matches) {
-      setVisible(true);
+    const notifyReady = () => {
       if (!introNotifiedRef.current) {
         introNotifiedRef.current = true;
         onIntroReadyRef.current?.();
       }
+    };
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reduced.matches || introMode === "instant") {
+      setVisible(true);
+      notifyReady();
       return;
     }
 
     const show = requestAnimationFrame(() => setVisible(true));
-    const done = window.setTimeout(() => {
-      if (!introNotifiedRef.current) {
-        introNotifiedRef.current = true;
-        onIntroReadyRef.current?.();
-      }
-    }, HERO_INTRO_BUST_FADE_MS);
+    const done = window.setTimeout(notifyReady, HERO_INTRO_BUST_FADE_MS);
 
     return () => {
       cancelAnimationFrame(show);
       window.clearTimeout(done);
     };
-  }, [assetReady]);
+  }, [assetReady, introMode]);
 
   return (
     <div
@@ -83,11 +89,16 @@ export function HeroBustGlitch({
         "relative overflow-hidden",
         "aspect-614/1030",
         enableHoverPixelate && "cursor-crosshair",
-        "transition-opacity ease-out motion-reduce:transition-none",
+        introMode === "fade" &&
+          "transition-opacity ease-out motion-reduce:transition-none",
         visible ? "opacity-100" : "opacity-0",
         className,
       )}
-      style={{ transitionDuration: `${HERO_INTRO_BUST_FADE_MS}ms` }}
+      style={
+        introMode === "fade"
+          ? { transitionDuration: `${HERO_INTRO_BUST_FADE_MS}ms` }
+          : undefined
+      }
     >
       <img
         src={HERO_BUST_DEFAULT_LAYER}

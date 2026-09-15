@@ -9,7 +9,12 @@ export interface HeroBustProps {
    * Hero stage so the bust can fill the full viewport on desktop.
    */
   className?: string;
-  /** Fires after the intro fade-in completes. */
+  /**
+   * `fade` — legacy opacity intro; `instant` — ready behind Lottie curtain.
+   * @default "fade"
+   */
+  introMode?: "fade" | "instant";
+  /** Fires after the intro fade-in completes (or immediately if instant). */
   onIntroReady?: () => void;
 }
 
@@ -18,11 +23,16 @@ export interface HeroBustProps {
  *
  * Delegates to {@link HeroBustGlitch}: glitch on the bust using the shared pipeline.
  */
-export function HeroBust({ className, onIntroReady }: HeroBustProps) {
+export function HeroBust({
+  className,
+  introMode = "fade",
+  onIntroReady,
+}: HeroBustProps) {
   return (
     <HeroBustGlitch
       className={className}
       enableHoverPixelate={true}
+      introMode={introMode}
       onIntroReady={onIntroReady}
     />
   );

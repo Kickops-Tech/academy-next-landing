@@ -164,6 +164,24 @@
   }
 }
 
+/* Hero Lottie intro: SSR black curtain until the player paints; scroll lock while alive. */
+.hero-intro-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #000;
+}
+
+.hero-intro-locked {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-intro-backdrop {
+    display: none;
+  }
+}
+
 /* Rationale: globo corporativo — lifecycle sequencial por ponto; scale no <g> interno (translate no pai). */
 @keyframes target-globe-dot-lifecycle {
   0% {

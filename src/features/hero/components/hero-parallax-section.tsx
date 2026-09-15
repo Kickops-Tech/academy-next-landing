@@ -4,17 +4,19 @@ import { Button } from "@shadcn/ui/button";
 import { HeroArtificialText } from "@features/hero/components/hero-artificial-text";
 import { HeroBaffleText } from "@features/hero/components/hero-baffle-text";
 import { HeroBust } from "@features/hero/components/hero-bust";
+import type { HeroIntroLoaderProps } from "@features/hero/components/hero-intro-loader";
 import {
-  HERO_INTRO_COPY_AFTER_TITLE_MS,
   HERO_INTRO_COPY_DURATION_MS,
+  HERO_INTRO_LOADER_ENABLED,
   HERO_INTRO_TITLE_BAFFLE,
-  HERO_INTRO_TITLE_GAP_MS,
 } from "@features/hero/constants/hero-intro";
 import { HERO_SCROLL_CSS } from "@features/hero/constants/hero-scroll-parallax";
+import { useHeroIntroSequence } from "@features/hero/hooks/use-hero-intro-sequence";
 import { useHeroScrollParallax } from "@features/hero/hooks/use-hero-scroll-parallax";
 import { cn } from "@shadcn/lib/utils";
 import { ArrowRight } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, type CSSProperties } from "react";
 
 /**
  * Supporting copy under the Hero title (Figma Home D / Home M).
@@ -51,46 +53,37 @@ const TITLE_LAYER_STYLE = layerStyle(
 );
 
 /**
+ * Lazy Lottie loader. Import lives only here so the kill-switch never pulls
+ * `lottie_light` / JSON into the hero chunk. Failed chunk → onFinish release.
+ */
+const HeroIntroLoader = HERO_INTRO_LOADER_ENABLED
+  ? dynamic(
+      () =>
+        import("@features/hero/components/hero-intro-loader").catch(() => ({
+          default: function HeroIntroLoaderFailed({
+            onFinish,
+          }: HeroIntroLoaderProps) {
+            useEffect(() => {
+              onFinish();
+            }, [onFinish]);
+            return null;
+          },
+        })),
+      { ssr: false },
+    )
+  : null;
+
+/**
  * Hero section with scroll parallax: bust moves up faster and fades slower;
  * titles and copy fade out sooner with lighter vertical travel.
  *
- * Intro: bust fade-in → title baffle → copy/CTA fade-in slide-up.
+ * Intro: optional Lottie loader → title baffle → copy/CTA fade-in slide-up.
  */
 export function HeroParallaxSection() {
   const sectionRef = useRef<HTMLElement>(null);
   useHeroScrollParallax(sectionRef);
 
-  const [titleActive, setTitleActive] = useState(false);
-  const [copyActive, setCopyActive] = useState(false);
-
-  const onBustIntroReady = useCallback(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (reduced.matches) {
-      setTitleActive(true);
-      setCopyActive(true);
-      return;
-    }
-
-    window.setTimeout(() => setTitleActive(true), HERO_INTRO_TITLE_GAP_MS);
-  }, []);
-
-  useEffect(() => {
-    if (!titleActive || copyActive) {
-      return;
-    }
-
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (reduced.matches) {
-      setCopyActive(true);
-      return;
-    }
-
-    const timer = window.setTimeout(
-      () => setCopyActive(true),
-      HERO_INTRO_COPY_AFTER_TITLE_MS,
-    );
-    return () => window.clearTimeout(timer);
-  }, [titleActive, copyActive]);
+  const intro = useHeroIntroSequence();
 
   return (
     <section
@@ -105,6 +98,23 @@ export function HeroParallaxSection() {
         "bg-radial from-kickops-lightgray to-kickops-gray",
       )}
     >
+      {intro.showBackdrop ? (
+        <div className="hero-intro-backdrop" aria-hidden={true} />
+      ) : null}
+
+      <noscript>
+        <style>{`.hero-intro-backdrop{display:none!important}`}</style>
+      </noscript>
+
+      {intro.loaderMounted && HeroIntroLoader ? (
+        <HeroIntroLoader
+          pageReady={intro.pageReady}
+          onPlayerReady={intro.onPlayerReady}
+          onReveal={intro.onReveal}
+          onFinish={intro.onFinish}
+        />
+      ) : null}
+
       <div
         className={cn(
           "pointer-events-none absolute inset-0 z-0",
@@ -120,7 +130,8 @@ export function HeroParallaxSection() {
           style={BUST_LAYER_STYLE}
         >
           <HeroBust
-            onIntroReady={onBustIntroReady}
+            introMode={intro.bustIntroMode}
+            onIntroReady={intro.onBustIntroReady}
             className={cn(
               "select-none",
               /*
@@ -174,14 +185,14 @@ export function HeroParallaxSection() {
           className={cn(
             "flex w-full max-w-full flex-col items-center overflow-visible",
             "leading-none tracking-tight",
-            !titleActive && "invisible",
+            !intro.titleActive && "invisible",
           )}
           style={TITLE_LAYER_STYLE}
-          aria-hidden={!titleActive}
+          aria-hidden={!intro.titleActive}
         >
           <HeroBaffleText
             text={"Introspecção"}
-            enabled={titleActive}
+            enabled={intro.titleActive}
             delay={HERO_INTRO_TITLE_BAFFLE.introspeccao.delay}
             duration={HERO_INTRO_TITLE_BAFFLE.introspeccao.duration}
             className={cn(
@@ -202,13 +213,13 @@ export function HeroParallaxSection() {
           >
             <HeroBaffleText
               text={"Inteligência"}
-              enabled={titleActive}
+              enabled={intro.titleActive}
               delay={HERO_INTRO_TITLE_BAFFLE.inteligencia.delay}
               duration={HERO_INTRO_TITLE_BAFFLE.inteligencia.duration}
               className={cn("block text-kickops-green")}
             />
             <HeroArtificialText
-              enabled={titleActive}
+              enabled={intro.titleActive}
               delay={HERO_INTRO_TITLE_BAFFLE.artificial.delay}
               duration={HERO_INTRO_TITLE_BAFFLE.artificial.duration}
               className={cn("text-kickops-yellow", "-mt-[0.14em] lg:mt-0")}
@@ -223,20 +234,22 @@ export function HeroParallaxSection() {
         <div
           style={{
             transform: `translate3d(0, var(${HERO_SCROLL_CSS.copyY}, 0px), 0)`,
-            opacity: copyActive
+            opacity: intro.copyActive
               ? `var(${HERO_SCROLL_CSS.copyOpacity}, 1)`
               : 1,
           }}
         >
           <div
             style={{
-              opacity: copyActive ? 1 : 0,
-              transform: copyActive ? "translateY(0)" : "translateY(1.25rem)",
+              opacity: intro.copyActive ? 1 : 0,
+              transform: intro.copyActive
+                ? "translateY(0)"
+                : "translateY(1.25rem)",
               transition: `opacity ${HERO_INTRO_COPY_DURATION_MS}ms ease-out, transform ${HERO_INTRO_COPY_DURATION_MS}ms ease-out`,
             }}
             className={cn(
               "motion-reduce:transition-none",
-              !copyActive && "pointer-events-none",
+              !intro.copyActive && "pointer-events-none",
             )}
           >
             <p
