@@ -3,7 +3,6 @@
 import { ContentsColumns } from "@features/contents/components/contents-columns";
 import {
   CONTENTS_COLUMNS_BAND_SCALE,
-  CONTENTS_COLUMNS_STRIP_BOTTOM_BLEED_PX,
   CONTENTS_COLUMNS_STRIP_EDGE_MASK,
   getContentsColumnBandHeight,
   getContentsColumnStripFit,
@@ -94,13 +93,9 @@ export function ContentsColumnsStrip({
     <div
       ref={rootRef}
       aria-hidden
-      className={cn("relative w-full overflow-x-hidden overflow-y-visible", className)}
+      className={cn("relative w-full overflow-hidden", className)}
       style={{
-        height:
-          fit.stripHeight > 0
-            ? fit.stripHeight + CONTENTS_COLUMNS_STRIP_BOTTOM_BLEED_PX
-            : undefined,
-        marginBottom: -CONTENTS_COLUMNS_STRIP_BOTTOM_BLEED_PX,
+        height: fit.stripHeight > 0 ? fit.stripHeight : undefined,
         maskImage: CONTENTS_COLUMNS_STRIP_EDGE_MASK,
         WebkitMaskImage: CONTENTS_COLUMNS_STRIP_EDGE_MASK,
       }}
@@ -110,12 +105,7 @@ export function ContentsColumnsStrip({
         style={{
           left: `${stageLeftPercent}%`,
           width: `${stageWidthPercent}%`,
-          height:
-            fit.stageHeight > 0
-              ? fit.stageHeight +
-                CONTENTS_COLUMNS_STRIP_BOTTOM_BLEED_PX /
-                  (needsFit ? fit.fitScale : 1)
-              : undefined,
+          height: fit.stageHeight > 0 ? fit.stageHeight : undefined,
           transform: needsFit ? `scale(${fit.fitScale})` : undefined,
         }}
       >

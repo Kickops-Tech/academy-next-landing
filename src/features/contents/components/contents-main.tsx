@@ -19,9 +19,9 @@ export function ContentsMain() {
       data-globe-section="contents"
       style={SECTION_HEADING_SECTION_STYLE}
       className={cn(
-        "flex w-full min-h-0 flex-col overflow-visible text-kickops-gray",
-        // Visible: allow strip bottom bleed under Formats. Horizontal clip lives
-        // on the strip / carousel shells — not here (x-clip + y-visible collapses).
+        "flex w-full min-h-0 flex-col overflow-clip text-kickops-gray",
+        // Natural content height (no min-h-fold) so mobile/md don’t invent whitespace.
+        // overflow-clip: shaft AABBs extend past the Figma frame — keep them in this fold.
       )}
     >
       <ContentsSection parallax={layers} transitionMs={transitionMs} />

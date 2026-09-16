@@ -50,9 +50,9 @@ export function ContentsSection({
         (715:2054 phone / 659:435 tablet), height-capped so width doesn’t
         invent a tall empty stage.
       */}
-      <div className="@container relative flex w-full flex-col overflow-visible xl:hidden">
+      <div className="@container relative flex w-full flex-col overflow-hidden xl:hidden">
         <ContentsHeading variant="mobile" />
-        <div className="relative z-20 overflow-x-clip">
+        <div className="relative z-20">
           <ContentsTopicsCarousel />
         </div>
         <ContentsColumnsStrip
