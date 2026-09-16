@@ -1,8 +1,9 @@
 "use client";
 
+import { LANDING_SECTION_ID } from "@core/constants/landing-sections";
+import { SECTION_HEADING_SECTION_STYLE } from "@core/utils/section-heading-parallax-style";
 import { TargetAudienceSection } from "@features/target/components/target-audience-section";
 import { useTargetHeadingParallax } from "@features/target/hooks/use-target-heading-parallax";
-import { SECTION_HEADING_SECTION_STYLE } from "@core/utils/section-heading-parallax-style";
 import { cn } from "@shadcn/lib/utils";
 import { useRef } from "react";
 
@@ -13,6 +14,7 @@ export function TargetMain() {
   return (
     <section
       ref={sectionRef}
+      id={LANDING_SECTION_ID.target}
       aria-label="Pra quem"
       data-globe-section="target"
       style={SECTION_HEADING_SECTION_STYLE}

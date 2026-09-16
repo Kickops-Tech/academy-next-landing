@@ -217,7 +217,7 @@ function ScrollCarouselIndicator({
   };
 
   return (
-    <div className={cn("mt-3 flex h-3 items-center", GUTTER_CLASS)}>
+    <div className={cn("mt-10 flex h-3 items-center", GUTTER_CLASS)}>
       <div
         ref={trackRef}
         role="scrollbar"

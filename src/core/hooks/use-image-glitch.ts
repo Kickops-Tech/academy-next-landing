@@ -520,6 +520,11 @@ export function useImageGlitch(
         return true;
       }
 
+      // Hide canvas until textures + first draw — cleared buffer composites as
+      // an opaque black square (brain stage) while PNG reload is in flight.
+      texturesReadyRef.current = false;
+      setIsReady(false);
+
       resizeGlitchCanvas(canvas, cssWidth, cssHeight);
 
       rendererRef.current?.destroy();
@@ -550,6 +555,7 @@ export function useImageGlitch(
       const activeRenderer = rendererRef.current;
       if (!activeRenderer || activeRenderer.gl.isContextLost()) {
         texturesReadyRef.current = false;
+        setIsReady(false);
         return false;
       }
 
@@ -631,6 +637,17 @@ export function useImageGlitch(
 
     scheduleResize(true);
 
+    const onContextLost = (event: Event) => {
+      event.preventDefault();
+      texturesReadyRef.current = false;
+      setIsReady(false);
+    };
+    const onContextRestored = () => {
+      scheduleResize(true);
+    };
+    canvas.addEventListener("webglcontextlost", onContextLost);
+    canvas.addEventListener("webglcontextrestored", onContextRestored);
+
     const resizeObserver = new ResizeObserver(() => scheduleResize());
     resizeObserver.observe(container);
 
@@ -649,6 +666,8 @@ export function useImageGlitch(
       cancelAnimationFrame(rafRef.current);
       animationStartedRef.current = false;
       texturesReadyRef.current = false;
+      canvas.removeEventListener("webglcontextlost", onContextLost);
+      canvas.removeEventListener("webglcontextrestored", onContextRestored);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       motionQuery.removeEventListener("change", onMotionChange);

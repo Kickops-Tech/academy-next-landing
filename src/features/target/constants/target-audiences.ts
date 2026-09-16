@@ -33,7 +33,7 @@ export const TARGET_AUDIENCES: TargetAudience[] = [
     descriptionClassName: "text-kickops-gray",
     drawerTitle: "Empresas e equipes corporativas",
     drawerDescription:
-      "Programas de IA pensados para escalar conhecimento, padronizar processos e dar autonomia aos times corporativos — do onboarding à operação do dia a dia.",
+      "Programas de IA pensados para escalar conhecimento, padronizar processos e dar autonomia aos times corporativos. Preencha os dados abaixo e entraremos em contato.",
     drawerStubBlocks: [
       {
         heading: "Capacitação em escala",
@@ -58,7 +58,7 @@ export const TARGET_AUDIENCES: TargetAudience[] = [
     descriptionClassName: "text-white",
     drawerTitle: "Profissionais de áreas não-técnicas",
     drawerDescription:
-      "Ferramentas e linguagem acessível para marketing, operações, RH e outras áreas criarem fluxos com IA — sem barreira técnica desnecessária.",
+      "Ferramentas e linguagem acessível para marketing, operações, RH e outras áreas criarem fluxos com IA — sem barreira técnica desnecessária. Preencha os dados abaixo e entraremos em contato.",
     drawerStubBlocks: [
       {
         heading: "Do prompt ao fluxo",
@@ -83,7 +83,7 @@ export const TARGET_AUDIENCES: TargetAudience[] = [
     descriptionClassName: "text-kickops-gray",
     drawerTitle: "Equipes que precisam de automatização",
     drawerDescription:
-      "Combinação de criatividade e execução técnica para tirar trabalho repetitivo das filas e liberar tempo para decisões de maior valor.",
+      "Combinação de criatividade e execução técnica para tirar trabalho repetitivo das filas e liberar tempo para decisões de maior valor. Preencha os dados abaixo e entraremos em contato.",
     drawerStubBlocks: [
       {
         heading: "Automação assistida",

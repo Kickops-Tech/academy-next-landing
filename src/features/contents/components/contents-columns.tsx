@@ -1,21 +1,20 @@
 "use client";
 
 import type { ContentsColumnParallaxState } from "@features/contents/hooks/use-contents-column-parallax";
-import { useContentsColumnScale } from "@features/contents/hooks/use-contents-column-scale";
-import { useContentsColumnSpread } from "@features/contents/hooks/use-contents-column-spread";
 import {
   CONTENTS_COLUMNS_MASK,
+  CONTENTS_GLOW_BLUR_INSET,
+  figmaBoxStyle,
   getContentsBoxStyle,
   getContentsColumns,
   getContentsFrame,
-  spreadFigmaBoxStyle,
   type ContentsColumnId,
   type ContentsColumnLayer,
   type ContentsLayoutVariant,
 } from "@features/contents/constants/contents-layout";
 import { cn } from "@shadcn/lib/utils";
 import Image from "next/image";
-import { useRef, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 
 const GLOW_KEYS = ["glow1", "glow2", "glow3"] as const;
 
@@ -25,13 +24,10 @@ type ContentsColumnsProps = {
   transitionMs: number;
   /** Soft top mask. Off by default — Figma shows full shaft tops without a veil. */
   fadeTop?: boolean;
-  /** Overrides measured composition scale (strip / special stages). */
-  compositionScale?: number;
   /**
-   * Overrides width-based fan-out. Flow strips lock to 1 so tablet widths
-   * don’t push Figma shafts off-screen (narrowSpread was ~1.45–1.55).
+   * Composition scale. Default 1 (Figma absolute). Strip may pass fit scale.
    */
-  spread?: number;
+  compositionScale?: number;
 };
 
 function outerParallaxStyle(
@@ -57,8 +53,10 @@ function innerArtStyle(layer: ContentsColumnLayer): CSSProperties {
 }
 
 function ColumnGlows({ variant }: { variant: ContentsLayoutVariant }) {
+  const blurInset = CONTENTS_GLOW_BLUR_INSET[variant];
+
   return (
-    <>
+    <div className="absolute inset-0">
       {GLOW_KEYS.map((key) => {
         const style = getContentsBoxStyle(key, variant);
         if (!style) {
@@ -66,47 +64,43 @@ function ColumnGlows({ variant }: { variant: ContentsLayoutVariant }) {
         }
 
         return (
-          <div key={key} className="absolute" style={style}>
-            <Image
-              src="/img/contents/glow.svg"
-              alt=""
-              fill
-              className="object-contain opacity-60"
-              unoptimized
-            />
+          <div key={key} className="absolute overflow-visible" style={style}>
+            <div className="absolute" style={{ inset: blurInset }}>
+              <Image
+                src="/img/contents/glow.svg"
+                alt=""
+                fill
+                className="object-contain opacity-80"
+                unoptimized
+              />
+            </div>
           </div>
         );
       })}
-    </>
+    </div>
   );
 }
 
+/**
+ * Decorative shafts + soft base glows — Figma absolute layout (no fan-out).
+ */
 export function ContentsColumns({
   variant,
   parallax,
   transitionMs,
   fadeTop = false,
-  compositionScale: compositionScaleProp,
-  spread: spreadProp,
+  compositionScale = 1,
 }: ContentsColumnsProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const measuredSpread = useContentsColumnSpread(containerRef, variant);
-  const measuredScale = useContentsColumnScale(containerRef, variant);
-  const spread = spreadProp ?? measuredSpread;
-  const compositionScale = compositionScaleProp ?? measuredScale;
   const frame = getContentsFrame(variant);
   const columns = getContentsColumns(variant);
   const mask = fadeTop === true ? CONTENTS_COLUMNS_MASK[variant] : undefined;
 
   return (
     <div
-      ref={containerRef}
       className={cn(
         "pointer-events-none absolute inset-0 z-0 overflow-hidden",
       )}
     >
-      <ColumnGlows variant={variant} />
-
       <div
         className="absolute inset-0"
         style={
@@ -117,15 +111,16 @@ export function ContentsColumns({
       >
         <div
           className="absolute inset-0 origin-bottom"
-          style={{ transform: `scale(${compositionScale})` }}
+          style={
+            compositionScale !== 1
+              ? { transform: `scale(${compositionScale})` }
+              : undefined
+          }
         >
+          <ColumnGlows variant={variant} />
+
           {columns.map((layer) => {
-            const box = spreadFigmaBoxStyle(
-              layer.box,
-              frame,
-              spread,
-              layer.spreadWeight ?? 1,
-            );
+            const box = figmaBoxStyle(layer.box, frame);
 
             return (
               <div

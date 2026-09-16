@@ -1,6 +1,7 @@
 "use client";
 
 import { FOLD_STAGE_SHELL_CLASS } from "@core/constants/fold-stage";
+import { InViewReveal } from "@core/components/in-view-reveal";
 import { TargetCard } from "@features/target/components/target-card";
 import { TargetCorporateCardContent } from "@features/target/components/target-corporate-card-content";
 import { TargetDrawerContent } from "@features/target/components/target-drawer-content";
@@ -51,22 +52,21 @@ function TargetAudienceCard({
   variant,
   placement,
   className,
+  revealIndex = 0,
 }: {
   audience: TargetAudience;
   onSelect: () => void;
   variant: TargetLayoutVariant;
   placement: "absolute" | "flow";
   className?: string;
+  revealIndex?: number;
 }) {
   return (
-    <TargetCard
-      ariaLabel={audience.title}
-      onClick={onSelect}
+    <InViewReveal
+      index={revealIndex}
       className={cn(
-        "overflow-hidden",
         placement === "absolute" && "absolute",
         placement === "flow" && "relative w-full",
-        audience.shellClassName,
         className,
       )}
       style={
@@ -75,8 +75,17 @@ function TargetAudienceCard({
           : undefined
       }
     >
-      <TargetAudienceCardContent audience={audience} variant={variant} />
-    </TargetCard>
+      <TargetCard
+        ariaLabel={audience.title}
+        onClick={onSelect}
+        className={cn(
+          "h-full w-full overflow-hidden",
+          audience.shellClassName,
+        )}
+      >
+        <TargetAudienceCardContent audience={audience} variant={variant} />
+      </TargetCard>
+    </InViewReveal>
   );
 }
 
@@ -116,12 +125,13 @@ export function TargetAudienceSection() {
         <div className="relative hidden w-full lg:block">
           <div className="@container relative aspect-[1512/982] w-full">
             <TargetHeading variant="desktop" />
-            {TARGET_AUDIENCES.map((audience) => (
+            {TARGET_AUDIENCES.map((audience, index) => (
               <TargetAudienceCard
                 key={`desktop-${audience.id}`}
                 audience={audience}
                 variant="desktop"
                 placement="absolute"
+                revealIndex={index}
                 onSelect={() => setSelectedAudienceId(audience.id)}
               />
             ))}
@@ -138,12 +148,13 @@ export function TargetAudienceSection() {
               placement="flow"
             />
             <div className="grid grid-cols-2 gap-4 pb-2">
-              {TARGET_AUDIENCES.map((audience) => (
+              {TARGET_AUDIENCES.map((audience, index) => (
                 <TargetAudienceCard
                   key={`tablet-${audience.id}`}
                   audience={audience}
                   variant="desktop"
                   placement="flow"
+                  revealIndex={index}
                   className={TABLET_CARD_CLASS[audience.id]}
                   onSelect={() => setSelectedAudienceId(audience.id)}
                 />
@@ -156,12 +167,13 @@ export function TargetAudienceSection() {
         <div className="relative w-full px-4 md:hidden">
           <div className="@container relative aspect-[393/1471] w-full">
             <TargetHeading variant="mobile" />
-            {TARGET_AUDIENCES.map((audience) => (
+            {TARGET_AUDIENCES.map((audience, index) => (
               <TargetAudienceCard
                 key={`mobile-${audience.id}`}
                 audience={audience}
                 variant="mobile"
                 placement="absolute"
+                revealIndex={index}
                 onSelect={() => setSelectedAudienceId(audience.id)}
               />
             ))}
@@ -172,8 +184,9 @@ export function TargetAudienceSection() {
       <Drawer open={isDrawerOpen} onOpenChange={handleOpenChange}>
         <DrawerContent
           className={cn(
-            "max-h-[85vh] overflow-hidden rounded-t-2xl border-kickops-gray/15 bg-white px-0 pb-8",
-            "lg:h-[85vh] lg:data-[vaul-drawer-direction=bottom]:!mt-10",
+            "h-auto max-h-[94svh] overflow-hidden rounded-t-2xl border-kickops-gray/15 bg-white px-0 pb-4",
+            "data-[vaul-drawer-direction=bottom]:!mt-6",
+            "lg:max-h-[94svh] lg:pb-3 lg:data-[vaul-drawer-direction=bottom]:!mt-6",
             "lg:data-[vaul-drawer-direction=bottom]:!inset-x-[12.5vw] lg:data-[vaul-drawer-direction=bottom]:!w-auto",
           )}
         >

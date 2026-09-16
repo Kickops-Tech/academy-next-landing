@@ -30,12 +30,27 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+function isScrollLocked(): boolean {
+  return document.documentElement.classList.contains(SCROLL_LOCK_CLASS);
+}
+
 function lockScroll(): void {
   document.documentElement.classList.add(SCROLL_LOCK_CLASS);
 }
 
+/**
+ * Remove the intro scroll lock. Only force `scrollTo(0, 0)` when still locked
+ * and the document is already at the top — never yank a user who already scrolled.
+ */
 function unlockScroll(): void {
+  const wasLocked = isScrollLocked();
   document.documentElement.classList.remove(SCROLL_LOCK_CLASS);
+  if (!wasLocked) {
+    return;
+  }
+  if (window.scrollY > 0) {
+    return;
+  }
   window.scrollTo(0, 0);
 }
 
@@ -57,6 +72,7 @@ export function useHeroIntroSequence(): HeroIntroSequence {
   const revealedRef = useRef(false);
   const finishedRef = useRef(false);
   const baffleDelayTimerRef = useRef<number | null>(null);
+  const safetyTimerRef = useRef<number | null>(null);
 
   const pageReady =
     loaderPath && (readyTimedOut || (bustReady && fontsReady));
@@ -65,6 +81,13 @@ export function useHeroIntroSequence(): HeroIntroSequence {
     if (baffleDelayTimerRef.current !== null) {
       window.clearTimeout(baffleDelayTimerRef.current);
       baffleDelayTimerRef.current = null;
+    }
+  }, []);
+
+  const clearSafetyTimer = useCallback(() => {
+    if (safetyTimerRef.current !== null) {
+      window.clearTimeout(safetyTimerRef.current);
+      safetyTimerRef.current = null;
     }
   }, []);
 
@@ -87,12 +110,17 @@ export function useHeroIntroSequence(): HeroIntroSequence {
   }, [activateTitle]);
 
   const releaseWithoutLoader = useCallback(() => {
+    if (finishedRef.current) {
+      return;
+    }
+    finishedRef.current = true;
+    clearSafetyTimer();
     clearBaffleDelay();
     setLoaderMounted(false);
     setShowBackdrop(false);
     unlockScroll();
     activateTitle();
-  }, [activateTitle, clearBaffleDelay]);
+  }, [activateTitle, clearBaffleDelay, clearSafetyTimer]);
 
   const onBustIntroReady = useCallback(() => {
     if (loaderPath) {
@@ -122,6 +150,7 @@ export function useHeroIntroSequence(): HeroIntroSequence {
       return;
     }
     finishedRef.current = true;
+    clearSafetyTimer();
     setLoaderMounted(false);
     setShowBackdrop(false);
     unlockScroll();
@@ -129,7 +158,7 @@ export function useHeroIntroSequence(): HeroIntroSequence {
     if (!revealedRef.current) {
       scheduleTitleAfterReveal();
     }
-  }, [scheduleTitleAfterReveal]);
+  }, [clearSafetyTimer, scheduleTitleAfterReveal]);
 
   const onLoaderFailed = useCallback(() => {
     releaseWithoutLoader();
@@ -167,18 +196,20 @@ export function useHeroIntroSequence(): HeroIntroSequence {
       setReadyTimedOut(true);
     }, HERO_INTRO_LOADER.readyTimeoutMs);
 
-    const safetyTimer = window.setTimeout(() => {
+    safetyTimerRef.current = window.setTimeout(() => {
+      safetyTimerRef.current = null;
       releaseWithoutLoader();
     }, HERO_INTRO_LOADER.backdropSafetyMs);
 
     return () => {
       cancelled = true;
       window.clearTimeout(readyTimer);
-      window.clearTimeout(safetyTimer);
+      clearSafetyTimer();
       clearBaffleDelay();
-      unlockScroll();
+      // Cleanup: drop lock only — never force scroll to top on remount.
+      document.documentElement.classList.remove(SCROLL_LOCK_CLASS);
     };
-  }, [loaderPath, releaseWithoutLoader, clearBaffleDelay]);
+  }, [loaderPath, releaseWithoutLoader, clearBaffleDelay, clearSafetyTimer]);
 
   // Copy/CTA after title starts (shared by both paths).
   useEffect(() => {

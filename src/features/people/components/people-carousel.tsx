@@ -1,5 +1,6 @@
 "use client";
 
+import { InViewReveal } from "@core/components/in-view-reveal";
 import { PeopleAgentSlide } from "@features/people/components/people-agent-slide";
 import {
   PEOPLE_AGENTS,
@@ -88,40 +89,42 @@ export function PeopleCarousel({ layout, className }: PeopleCarouselProps) {
         className,
       )}
     >
-      <div
-        ref={trackRef}
-        className={cn(
-          "relative w-full touch-pan-y select-none overflow-visible",
-          layout === "desktop" && "cursor-grab",
-          layout === "desktop" && isDragging && "cursor-grabbing",
-        )}
-        onPointerDown={handlePointerDown}
-      >
+      <InViewReveal className="w-full">
         <div
-          className="relative w-full will-change-[opacity,transform]"
-          style={{
-            transition,
-            transform: `translateX(${offsetPx}px)`,
-            opacity: currentOpacity,
-          }}
+          ref={trackRef}
+          className={cn(
+            "relative w-full touch-pan-y select-none overflow-visible",
+            layout === "desktop" && "cursor-grab",
+            layout === "desktop" && isDragging && "cursor-grabbing",
+          )}
+          onPointerDown={handlePointerDown}
         >
-          <PeopleAgentSlide agent={agent} layout={layout} />
-        </div>
-
-        {neighbor ? (
           <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 will-change-[opacity,transform]"
+            className="relative w-full will-change-[opacity,transform]"
             style={{
               transition,
-              transform: `translateX(${offsetPx + neighborShift}px)`,
-              opacity: neighborOpacity,
+              transform: `translateX(${offsetPx}px)`,
+              opacity: currentOpacity,
             }}
           >
-            <PeopleAgentSlide agent={neighbor} layout={layout} />
+            <PeopleAgentSlide agent={agent} layout={layout} />
           </div>
-        ) : null}
-      </div>
+
+          {neighbor ? (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 will-change-[opacity,transform]"
+              style={{
+                transition,
+                transform: `translateX(${offsetPx + neighborShift}px)`,
+                opacity: neighborOpacity,
+              }}
+            >
+              <PeopleAgentSlide agent={neighbor} layout={layout} />
+            </div>
+          ) : null}
+        </div>
+      </InViewReveal>
 
       <div
         className="mt-8 flex items-center gap-3"

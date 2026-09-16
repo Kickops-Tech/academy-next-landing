@@ -1,6 +1,6 @@
 "use client";
 
-import { SECTION_DISPLAY_HEADING_MOBILE } from "@core/constants/section-display-heading";
+import { SECTION_DISPLAY_HEADING } from "@core/constants/section-display-heading";
 import {
   SECTION_HEADING_LEAD_STYLE,
   SECTION_HEADING_TRAIL_STYLE,
@@ -9,23 +9,12 @@ import { PEOPLE_HEADING } from "@features/people/constants/people-content";
 import type { PeopleLayoutVariant } from "@features/people/constants/people-layout";
 import { cn } from "@shadcn/lib/utils";
 
-const HEADING_FONT = {
-  desktop: {
-    lead: "text-[6.61cqw]",
-    display: "text-[13.23cqw]",
-  },
-  mobile: {
-    lead: SECTION_DISPLAY_HEADING_MOBILE.lead,
-    display: SECTION_DISPLAY_HEADING_MOBILE.display,
-  },
-} as const;
-
 type PeopleHeadingProps = {
   variant: PeopleLayoutVariant;
 };
 
 export function PeopleHeading({ variant }: PeopleHeadingProps) {
-  const fonts = HEADING_FONT[variant];
+  const fonts = SECTION_DISPLAY_HEADING[variant];
 
   if (variant === "mobile") {
     return (

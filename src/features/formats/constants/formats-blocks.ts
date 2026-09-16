@@ -12,6 +12,7 @@ export type FormatsBlock = {
   paragraphs: FormatsParagraph[];
 };
 
+/** Block copy — Figma 918:286 (D) / 721:2099 (M). */
 export const FORMATS_BLOCKS: FormatsBlock[] = [
   {
     id: "formato",
@@ -53,10 +54,6 @@ export const FORMATS_BLOCKS: FormatsBlock[] = [
       },
       {
         text: "Entre em contato conosco para realizarmos essa personalização!",
-      },
-      {
-        text: "O tempo estimado da experiência é de até 4 horas.",
-        accent: true,
       },
     ],
   },

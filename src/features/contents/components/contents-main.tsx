@@ -19,8 +19,8 @@ export function ContentsMain() {
       data-globe-section="contents"
       style={SECTION_HEADING_SECTION_STYLE}
       className={cn(
-        "flex w-full min-h-fold flex-col overflow-clip text-kickops-gray",
-        // Fill comes from WireframeGlobeBand (watermark sits above fill).
+        "flex w-full min-h-0 flex-col overflow-clip text-kickops-gray",
+        // Natural content height (no min-h-fold) so mobile/md don’t invent whitespace.
         // overflow-clip: shaft AABBs extend past the Figma frame — keep them in this fold.
       )}
     >

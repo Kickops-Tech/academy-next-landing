@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  SCROLL_CAROUSEL_REVEAL_ROOT_MARGIN,
-  SCROLL_CAROUSEL_REVEAL_THRESHOLD,
-} from "@core/constants/scroll-carousel-reveal";
+  IN_VIEW_REVEAL_ROOT_MARGIN,
+  IN_VIEW_REVEAL_THRESHOLD,
+} from "@core/constants/in-view-reveal";
 import { useEffect, useState, type RefObject } from "react";
 
 function prefersReducedMotion() {
@@ -15,7 +15,7 @@ function prefersReducedMotion() {
 
 /**
  * Becomes true once and stays true when `ref` intersects the viewport.
- * Reduced motion → true immediately (skip wait).
+ * Reduced motion / missing IntersectionObserver → true immediately (skip wait).
  * `enabled: false` → true immediately (no observer).
  */
 export function useInViewOnce(
@@ -28,8 +28,8 @@ export function useInViewOnce(
 ) {
   const enabled = options?.enabled !== false;
   const [inView, setInView] = useState(!enabled);
-  const rootMargin = options?.rootMargin ?? SCROLL_CAROUSEL_REVEAL_ROOT_MARGIN;
-  const threshold = options?.threshold ?? SCROLL_CAROUSEL_REVEAL_THRESHOLD;
+  const rootMargin = options?.rootMargin ?? IN_VIEW_REVEAL_ROOT_MARGIN;
+  const threshold = options?.threshold ?? IN_VIEW_REVEAL_THRESHOLD;
 
   useEffect(() => {
     if (!enabled || inView) {
@@ -42,6 +42,11 @@ export function useInViewOnce(
     }
 
     if (prefersReducedMotion()) {
+      setInView(true);
+      return;
+    }
+
+    if (typeof IntersectionObserver === "undefined") {
       setInView(true);
       return;
     }

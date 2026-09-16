@@ -1,10 +1,12 @@
-/** Staggered fade-in + slide-up when a scroll carousel enters the viewport. */
-export const SCROLL_CAROUSEL_REVEAL_DURATION_MS = 520;
-export const SCROLL_CAROUSEL_REVEAL_STAGGER_MS = 100;
-export const SCROLL_CAROUSEL_REVEAL_TRANSLATE_Y = "1.25rem";
-export const SCROLL_CAROUSEL_REVEAL_EASE =
-  "cubic-bezier(0.22, 1, 0.36, 1)";
-
-/** IntersectionObserver: fire when a meaningful slice is visible. */
-export const SCROLL_CAROUSEL_REVEAL_ROOT_MARGIN = "0px 0px -12% 0px";
-export const SCROLL_CAROUSEL_REVEAL_THRESHOLD = 0.18;
+/**
+ * @deprecated Import from `@core/constants/in-view-reveal` instead.
+ * Re-exports kept so existing carousel imports keep working.
+ */
+export {
+  IN_VIEW_REVEAL_DURATION_MS as SCROLL_CAROUSEL_REVEAL_DURATION_MS,
+  IN_VIEW_REVEAL_STAGGER_MS as SCROLL_CAROUSEL_REVEAL_STAGGER_MS,
+  IN_VIEW_REVEAL_TRANSLATE_Y as SCROLL_CAROUSEL_REVEAL_TRANSLATE_Y,
+  IN_VIEW_REVEAL_EASE as SCROLL_CAROUSEL_REVEAL_EASE,
+  IN_VIEW_REVEAL_ROOT_MARGIN as SCROLL_CAROUSEL_REVEAL_ROOT_MARGIN,
+  IN_VIEW_REVEAL_THRESHOLD as SCROLL_CAROUSEL_REVEAL_THRESHOLD,
+} from "@core/constants/in-view-reveal";

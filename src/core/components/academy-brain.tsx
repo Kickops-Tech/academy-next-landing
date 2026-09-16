@@ -12,6 +12,7 @@ import {
   ACADEMY_BRAIN_PIXELATE_MASK_DECAY,
   ACADEMY_BRAIN_PIXELATE_MASK_STAMP_STRENGTH,
   ACADEMY_BRAIN_PIXELATE_STAMP_BLOCK_SPAN,
+  ACADEMY_BRAIN_TOP_FADE_MASK,
   type AcademyBrainLayout,
   type AcademyBrainVariant,
 } from "@core/constants/academy-brain";
@@ -54,14 +55,19 @@ const FLOW_BOX_STYLE: CSSProperties = {
   transform: `translate(-50%, ${ACADEMY_BRAIN_FLOW.shiftY})`,
 };
 
+const TOP_FADE_MASK_STYLE: CSSProperties = {
+  maskImage: ACADEMY_BRAIN_TOP_FADE_MASK,
+  WebkitMaskImage: ACADEMY_BRAIN_TOP_FADE_MASK,
+};
+
 function boxStyle(
   variant: AcademyBrainVariant,
   layout: AcademyBrainLayout,
 ): CSSProperties {
   if (layout === "flow") {
-    return FLOW_BOX_STYLE;
+    return { ...FLOW_BOX_STYLE, ...TOP_FADE_MASK_STYLE };
   }
-  return stageBoxStyle(variant);
+  return { ...stageBoxStyle(variant), ...TOP_FADE_MASK_STYLE };
 }
 
 function boxClassName(layout: AcademyBrainLayout) {

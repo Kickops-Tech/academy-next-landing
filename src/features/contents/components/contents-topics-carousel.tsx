@@ -18,7 +18,6 @@ export function ContentsTopicsCarousel({
       className={className}
       tone="dark"
       gap={CONTENTS_MOBILE_TOPIC_GAP}
-      reveal
       aria-label="Tópicos do conteúdo"
     >
       {CONTENTS_TOPICS.map((topic, index) => (
@@ -28,6 +27,7 @@ export function ContentsTopicsCarousel({
           className="shrink-0"
           style={{ width: CONTENTS_TOPIC_CARD.width }}
           pulseDelayMs={index * 280}
+          revealIndex={index}
           iconSize="fixed"
         />
       ))}

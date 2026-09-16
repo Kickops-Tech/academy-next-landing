@@ -1,12 +1,12 @@
 import { cn } from "@shadcn/lib/utils";
 import { ArrowRight } from "lucide-react";
-import Link from "next/link";
 import type { CSSProperties } from "react";
 
 type FormatsCtaProps = {
   className?: string;
   style?: CSSProperties;
   size?: "desktop" | "mobile";
+  onClick?: () => void;
 };
 
 /**
@@ -17,14 +17,16 @@ export function FormatsCta({
   className,
   style,
   size = "desktop",
+  onClick,
 }: FormatsCtaProps) {
   const fluid = size === "desktop";
 
   return (
-    <Link
-      href="#"
+    <button
+      type="button"
+      onClick={onClick}
       className={cn(
-        "group inline-flex items-center justify-center border-0 bg-kickops-gray",
+        "group inline-flex cursor-pointer items-center justify-center border-0 bg-kickops-gray",
         "font-bold text-center whitespace-nowrap",
         "transition-colors duration-300 ease-out",
         "hover:bg-white focus-visible:bg-white active:bg-white",
@@ -73,6 +75,6 @@ export function FormatsCta({
           strokeWidth={2.25}
         />
       </span>
-    </Link>
+    </button>
   );
 }

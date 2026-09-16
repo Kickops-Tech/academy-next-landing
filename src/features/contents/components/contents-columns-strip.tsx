@@ -115,7 +115,6 @@ export function ContentsColumnsStrip({
           transitionMs={transitionMs}
           fadeTop={false}
           compositionScale={bandScale}
-          spread={1}
         />
       </div>
     </div>

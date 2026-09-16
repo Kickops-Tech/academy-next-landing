@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "atropos/css";
 
 @custom-variant dark (&:is(.dark *));
 @custom-variant pointer-fine (@media (pointer: fine));
@@ -297,27 +296,6 @@
 @media (prefers-reduced-motion: reduce) {
   .contents-topic-icon {
     animation: none !important;
-  }
-}
-
-/**
- * Atropos (People agent photo) — fill the sized portrait frame.
- */
-.people-agent-atropos,
-.people-agent-atropos .atropos-scale,
-.people-agent-atropos .atropos-rotate,
-.people-agent-atropos .atropos-inner {
-  width: 100%;
-  height: 100%;
-}
-
-.people-agent-atropos .atropos-inner {
-  position: relative;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .people-agent-atropos {
-    pointer-events: none;
   }
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { SECTION_DISPLAY_HEADING_MOBILE } from "@core/constants/section-display-heading";
+import { SECTION_DISPLAY_HEADING } from "@core/constants/section-display-heading";
 import {
   SECTION_HEADING_LEAD_STYLE,
   SECTION_HEADING_TRAIL_STYLE,
@@ -8,23 +8,12 @@ import {
 import type { FormatsLayoutVariant } from "@features/formats/constants/formats-layout";
 import { cn } from "@shadcn/lib/utils";
 
-const HEADING_FONT = {
-  desktop: {
-    preciso: "text-[6.61cqw]",
-    saber: "text-[13.23cqw]",
-  },
-  mobile: {
-    preciso: SECTION_DISPLAY_HEADING_MOBILE.lead,
-    saber: SECTION_DISPLAY_HEADING_MOBILE.display,
-  },
-} as const;
-
 type FormatsHeadingProps = {
   variant: FormatsLayoutVariant;
 };
 
 export function FormatsHeading({ variant }: FormatsHeadingProps) {
-  const fonts = HEADING_FONT[variant];
+  const fonts = SECTION_DISPLAY_HEADING[variant];
 
   if (variant === "mobile") {
     return (
@@ -32,7 +21,7 @@ export function FormatsHeading({ variant }: FormatsHeadingProps) {
         <span
           className={cn(
             "relative z-10 font-abril-fatface leading-none text-kickops-yellow",
-            fonts.preciso,
+            fonts.lead,
           )}
           style={SECTION_HEADING_LEAD_STYLE}
         >
@@ -41,7 +30,7 @@ export function FormatsHeading({ variant }: FormatsHeadingProps) {
         <span
           className={cn(
             "relative z-0 font-league-gothic font-black leading-none text-white",
-            fonts.saber,
+            fonts.display,
           )}
           style={{
             marginLeft: "-0.8cqw",
@@ -63,7 +52,7 @@ export function FormatsHeading({ variant }: FormatsHeadingProps) {
         <span
           className={cn(
             "relative z-10 font-abril-fatface leading-none text-kickops-yellow",
-            fonts.preciso,
+            fonts.lead,
           )}
           style={SECTION_HEADING_LEAD_STYLE}
         >
@@ -72,7 +61,7 @@ export function FormatsHeading({ variant }: FormatsHeadingProps) {
         <span
           className={cn(
             "relative z-0 font-league-gothic font-black leading-none text-white",
-            fonts.saber,
+            fonts.display,
           )}
           style={{
             marginLeft: "-1.2cqw",

@@ -8,13 +8,12 @@ import {
  * Figma bottom band — crop the full frame so only the column zone shows.
  * Y from frame top; height = frame.height - top (715:2054 / 659:435).
  *
- * Mobile: earliest shaft top ≈ 399 → band from 380.
- * Desktop/tablet strip: start above the capital crowns (~300) so the hard
- * crop doesn’t guillotine volutes (was 430 — tops looked cut off on md–xl).
+ * Higher tops = shorter empty band above crowns (tighter fold under topics).
+ * Mobile earliest shaft ~399; desktop crowns ~430–450 in Figma crop.
  */
 export const CONTENTS_COLUMN_BAND_TOP: Record<ContentsLayoutVariant, number> = {
-  mobile: 380,
-  desktop: 300,
+  mobile: 420,
+  desktop: 430,
 };
 
 export function getContentsColumnBandHeight(variant: ContentsLayoutVariant) {
@@ -43,8 +42,8 @@ export const CONTENTS_COLUMNS_STRIP_MAX_SVH: Record<
   ContentsLayoutVariant,
   number
 > = {
-  mobile: 52,
-  desktop: 58,
+  mobile: 38,
+  desktop: 45,
 };
 
 /**

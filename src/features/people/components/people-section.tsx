@@ -9,7 +9,7 @@ function toPercent(value: number, total: number) {
 
 /**
  * Full-bleed readability scrim: bottom of the People fold up to just
- * under “MENTES PENSANTES” (heading sits ~4.45cqh; display ~13cqw tall).
+ * under “MENTES PENSANTES” (heading sits ~4.45cqh).
  */
 const PEOPLE_DESKTOP_SCRIM_TOP = 250;
 

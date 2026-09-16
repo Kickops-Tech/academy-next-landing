@@ -18,15 +18,15 @@ export function FormatsBlocksCarousel({
       className={className}
       tone="light"
       gap={FORMATS_MOBILE_BLOCK_GAP}
-      reveal
       aria-label="Formatos da introspecção"
     >
-      {FORMATS_BLOCKS.map((block) => (
+      {FORMATS_BLOCKS.map((block, index) => (
         <FormatsBlockCard
           key={block.id}
           block={block}
           className="shrink-0"
           style={{ width: FORMATS_MOBILE_BLOCK_WIDTH }}
+          revealIndex={index}
         />
       ))}
     </ScrollCarousel>

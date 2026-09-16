@@ -1,5 +1,6 @@
 "use client";
 
+import { LANDING_SECTION_ID } from "@core/constants/landing-sections";
 import { Button } from "@shadcn/ui/button";
 import { HeroArtificialText } from "@features/hero/components/hero-artificial-text";
 import { HeroBaffleText } from "@features/hero/components/hero-baffle-text";
@@ -17,6 +18,22 @@ import { cn } from "@shadcn/lib/utils";
 import { ArrowRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, type CSSProperties } from "react";
+
+function scrollToSecondFold() {
+  const target = document.getElementById(LANDING_SECTION_ID.target);
+  if (!target) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
+  target.scrollIntoView({
+    behavior: prefersReducedMotion ? "auto" : "smooth",
+    block: "start",
+  });
+}
 
 /**
  * Supporting copy under the Hero title (Figma Home D / Home M).
@@ -138,18 +155,19 @@ export function HeroParallaxSection() {
                 Height-driven so aspect ratio resolves. Caps climb through 2xl/3xl
                 then plateau — no pure-vw growth on 4K ultrawides.
               */
-              "h-[min(86svh,42rem)] w-auto max-w-[min(100vw,28rem)]",
-              "md:h-[min(110svh,64.375rem)] md:max-w-none",
-              "2xl:h-[min(108svh,72rem)]",
-              "3xl:h-[min(105svh,80rem)]",
+              "h-[min(90svh,44rem)] w-auto max-w-[min(100vw,30rem)]",
+              // Tall enough to dominate the fold; mild translate keeps crown air.
+              "md:h-[min(108svh,68rem)] md:max-w-none",
+              "2xl:h-[min(106svh,74rem)]",
+              "3xl:h-[min(104svh,82rem)]",
               /*
-                Lift bust so eyes/nose clear “Introspecção”; title still cuts
-                mouth/beard. Offset on the bust node — parent keeps parallax.
+                Mild lift so eyes/nose clear “Introspecção”; keep breathing room
+                at the viewport top on tall/short desktop folds.
               */
-              "-translate-y-[min(8vh,3rem)]",
-              "md:-translate-y-[min(12vh,6rem)]",
-              "xl:-translate-y-[min(14vh,7rem)]",
-              "3xl:-translate-y-[min(12vh,6.5rem)]",
+              "-translate-y-[min(4vh,1.5rem)]",
+              "md:-translate-y-[min(4vh,2rem)]",
+              "xl:-translate-y-[min(5vh,2.5rem)]",
+              "3xl:-translate-y-[min(4vh,2.25rem)]",
             )}
           />
         </div>
@@ -176,9 +194,9 @@ export function HeroParallaxSection() {
           "max-w-[94.5rem] 3xl:max-w-[120rem]",
           // Mobile: light top pad — justify-end parks the CTA; keep titles readable.
           "px-3 pb-8 pt-4",
-          // md+: slightly more top pad so title sits lower on the lifted bust.
-          "md:px-8 md:pb-16 md:pt-[min(44svh,22rem)]",
-          "3xl:pb-20 3xl:pt-[min(40svh,24rem)]",
+          // md+: more top pad so title + bust sit lower with air under the fold top.
+          "md:px-8 md:pb-16 md:pt-[min(50svh,26rem)]",
+          "3xl:pb-20 3xl:pt-[min(46svh,28rem)]",
         )}
       >
         <h1
@@ -254,15 +272,17 @@ export function HeroParallaxSection() {
           >
             <p
               className={cn(
-                "mt-5 max-w-[20.5625rem] text-sm leading-[1.4] text-white",
-                "md:mt-6 md:max-w-[40rem] md:text-base",
-                "3xl:mt-8 3xl:max-w-[48rem] 3xl:text-lg",
+                "mt-3 max-w-[20.5625rem] text-sm leading-[1.4] text-white",
+                "md:mt-4 md:max-w-[40rem] md:text-base",
+                "3xl:mt-5 3xl:max-w-[48rem] 3xl:text-lg",
               )}
             >
               {HERO_DESCRIPTION}
             </p>
 
             <Button
+              type="button"
+              onClick={scrollToSecondFold}
               className={cn(
                 "group mt-5 h-auto rounded-none border-0 md:mt-6 3xl:mt-8",
                 "inline-flex items-center justify-center",
