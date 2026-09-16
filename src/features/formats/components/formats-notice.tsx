@@ -1,7 +1,5 @@
 import {
   FORMATS_NOTICE,
-  FORMATS_NOTICE_DESKTOP,
-  FORMATS_NOTICE_MOBILE,
 } from "@features/formats/constants/formats-notice";
 import { cn } from "@shadcn/lib/utils";
 import Image from "next/image";
@@ -12,7 +10,7 @@ type FormatsNoticeProps = {
 };
 
 /**
- * Immersion-duration notice — Figma `918:351` (desktop) / `935:123` (mobile).
+ * Immersion-duration notice — Figma `918:351` copy on desktop and mobile.
  */
 export function FormatsNotice({
   density = "fluid",
@@ -43,31 +41,17 @@ export function FormatsNotice({
         )}
         unoptimized
       />
-      {fluid ? (
-        <p
-          className={cn(
-            "min-w-0 flex-1 text-right font-medium leading-[1.4]",
-            "text-[1.455cqw]",
-          )}
-        >
-          {FORMATS_NOTICE_DESKTOP.lead}
-          <span className="text-kickops-yellow">
-            {FORMATS_NOTICE_DESKTOP.highlight}
-          </span>
-        </p>
-      ) : (
-        <p
-          className={cn(
-            "min-w-0 flex-1 font-normal leading-[1.4] text-[14px]",
-          )}
-        >
-          {FORMATS_NOTICE_MOBILE.lead}
-          <span className="text-kickops-yellow">
-            {FORMATS_NOTICE_MOBILE.highlight}
-          </span>
-          {FORMATS_NOTICE_MOBILE.trail}
-        </p>
-      )}
+      <p
+        className={cn(
+          "min-w-0 flex-1 leading-[1.4]",
+          fluid
+            ? "text-right font-medium text-[1.455cqw]"
+            : "font-medium text-[14px]",
+        )}
+      >
+        {FORMATS_NOTICE.lead}
+        <span className="text-kickops-yellow">{FORMATS_NOTICE.highlight}</span>
+      </p>
     </aside>
   );
 }
