@@ -57,6 +57,12 @@ export const CONTENTS_COLUMNS_BAND_SCALE: Record<ContentsLayoutVariant, number> 
   };
 
 /**
+ * Extra px painted past the strip bottom into Formats. Covers compositor
+ * seams on fast mobile scroll without changing the visible crop much.
+ */
+export const CONTENTS_COLUMNS_STRIP_BOTTOM_BLEED_PX = 12;
+
+/**
  * Soft top edge only — blends the strip crop into the white page without
  * the heavy veil used on the full stage previously.
  */

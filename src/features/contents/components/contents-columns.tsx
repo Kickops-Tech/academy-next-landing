@@ -34,10 +34,12 @@ function outerParallaxStyle(
   parallax: ContentsColumnParallaxState[ContentsColumnId],
   transitionMs: number,
 ): CSSProperties {
+  const moving = parallax.translateX !== 0 || parallax.translateY !== 0;
   return {
     transform: `translate3d(${parallax.translateX}px, ${parallax.translateY}px, 0)`,
     transition: `transform ${transitionMs}ms ease-out`,
-    willChange: "transform",
+    // Avoid promoting a layer while idle — mobile fling can desync it from the fold.
+    ...(moving ? { willChange: "transform" as const } : null),
   };
 }
 
