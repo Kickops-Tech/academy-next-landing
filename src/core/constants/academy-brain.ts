@@ -61,8 +61,9 @@ export const ACADEMY_BRAIN_PARALLAX_TRANSLATE_VH = 30;
 export const ACADEMY_BRAIN_PARALLAX_CSS_Y = "--brain-y";
 
 /**
- * Soft top edge — fades the square stage cut (and any PNG shade) into the
- * Formats band so the crown never hard-clips against the grid.
+ * Soft top edge of the square stage — fade only in the empty PNG margin
+ * (yellow crown starts ~22% down the asset). Ending the fade before that
+ * avoids a horizontal “shade cut” across the folds.
  */
 export const ACADEMY_BRAIN_TOP_FADE_MASK =
-  "linear-gradient(to bottom, transparent 0%, transparent 6%, black 22%, black 100%)";
+  "linear-gradient(to bottom, transparent 0%, transparent 8%, black 16%, black 100%)";

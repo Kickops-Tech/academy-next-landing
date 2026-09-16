@@ -300,20 +300,22 @@
 }
 
 /**
- * Formats/People band fill (Figma `918:287`): solid gray + soft center disc
- * under the wireframe canvas so the globe stays visible.
- * Radial sized to ~one fold and pinned to the Formats top of the shared band.
+ * Formats/People band fill (Figma `918:287`): solid gray + soft disc from
+ * Formats top. Paint the radial at 100%×100% of the fill (no capped
+ * background-size) so the only soft edge is the gradient itself — a finite
+ * background box was leaving a hard horizontal cut mid-fold.
+ * Ellipse dies out before the People / brain bleed.
  */
 .wireframe-globe-fill-formats {
   background-color: var(--color-kickops-gray);
   background-image: radial-gradient(
-    circle at 50% 50%,
+    ellipse 120% 75% at 50% 0%,
     #282828 0%,
-    rgb(40 40 40 / 0.65) 26%,
-    transparent 58%
+    rgb(40 40 40 / 0.7) 32%,
+    transparent 72%
   );
   background-repeat: no-repeat;
-  background-size: 140% min(120svh, 70rem);
+  background-size: 100% 100%;
   background-position: center top;
 }
 

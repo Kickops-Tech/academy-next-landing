@@ -2,16 +2,23 @@ import { AcademyBrain } from "@core/components/academy-brain";
 import { PeopleCarousel } from "@features/people/components/people-carousel";
 import { PeopleHeading } from "@features/people/components/people-heading";
 import { PEOPLE_DESKTOP_FRAME } from "@features/people/constants/people-layout";
+import type { CSSProperties } from "react";
 
 function toPercent(value: number, total: number) {
   return `${(value / total) * 100}%`;
 }
 
 /**
- * Full-bleed readability scrim: bottom of the People fold up to just
- * under “MENTES PENSANTES” (heading sits ~4.45cqh).
+ * Full-bleed readability scrim under agent copy. Starts below the Formats
+ * bleed / brain crown so its top edge never draws a hard cut across folds.
  */
-const PEOPLE_DESKTOP_SCRIM_TOP = 250;
+const PEOPLE_DESKTOP_SCRIM_TOP = 360;
+
+/** Long transparent head — avoids a straight contrast line at the scrim top. */
+const PEOPLE_SCRIM_FADE: CSSProperties = {
+  backgroundImage:
+    "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.2) 65%, transparent 88%, transparent 100%)",
+};
 
 export function PeopleSection() {
   return (
@@ -26,9 +33,13 @@ export function PeopleSection() {
 
           <div
             aria-hidden={true}
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-[15] bg-linear-to-t from-black/90 via-black/55 to-transparent"
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[15]"
             style={{
-              top: toPercent(PEOPLE_DESKTOP_SCRIM_TOP, PEOPLE_DESKTOP_FRAME.height),
+              top: toPercent(
+                PEOPLE_DESKTOP_SCRIM_TOP,
+                PEOPLE_DESKTOP_FRAME.height,
+              ),
+              ...PEOPLE_SCRIM_FADE,
             }}
           />
 
@@ -56,7 +67,8 @@ export function PeopleSection() {
         <PeopleHeading variant="mobile" />
         <div
           aria-hidden={true}
-          className="pointer-events-none absolute inset-x-0 bottom-0 top-[7.5rem] z-[15] bg-linear-to-t from-black/90 via-black/55 to-transparent"
+          className="pointer-events-none absolute inset-x-0 bottom-0 top-[9rem] z-[15]"
+          style={PEOPLE_SCRIM_FADE}
         />
         <div className="relative z-20 w-full flex-1 pointer-events-auto">
           <PeopleCarousel layout="mobile" />
